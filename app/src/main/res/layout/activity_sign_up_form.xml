@@ -60,7 +60,7 @@
         android:layout_marginLeft="8dp"
         android:layout_marginRight="16dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="16dp"
         android:ems="10"
         android:hint="Sarah"
         android:inputType="textPersonName"
@@ -109,7 +109,6 @@
         android:hint="johndoe@mail.com"
         android:inputType="textEmailAddress"
         android:textColor="@color/colorPrimaryText"
-        app:layout_constraintLeft_toLeftOf="@+id/actuaLname"
         app:layout_constraintRight_toRightOf="@+id/actuaLname"
         app:layout_constraintTop_toBottomOf="@+id/actuaLname"/>
 

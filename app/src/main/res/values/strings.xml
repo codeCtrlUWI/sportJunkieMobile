@@ -6,4 +6,6 @@
     <string name="sign_up_with_google">Sign up with Google</string>
     <string name="have_an_account_already">Have an account already?</string>
     <string name="sign_in_with_email">Sign in with Email</string>
+    <string name="name_entry_limit">Name Must Be At Least 3 Characters</string>
+    <string name="enter_valid_email">Please Enter A Valid Email</string>
 </resources>
