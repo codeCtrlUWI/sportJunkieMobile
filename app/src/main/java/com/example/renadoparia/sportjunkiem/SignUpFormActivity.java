@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
@@ -13,12 +14,23 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 public class SignUpFormActivity extends AppCompatActivity implements View.OnClickListener
 {
     private static final String TAG = "SignUpFormActivity";
+    private static final String DB_CHILD = "USERS";
+    private static final String NAME_OF_FOLDER_FOR_PROFILEPIC = "Profile Pictures";
 
     private static final int GALLERY_REQUEST_CODE = 1;
 
@@ -28,10 +40,13 @@ public class SignUpFormActivity extends AppCompatActivity implements View.OnClic
     private EditText mPassword;
     private ImageButton mProfilePictureButton;
     private Button mRegisterButton;
+    private Button mTempLogoutButton;
     private Uri mImageUri;
 
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
+    private DatabaseReference mDatabaseRef;
+    private StorageReference mStorageRef;
 
     //TODO: Add Confirmation Password Field, Then Check To See if It's Valid against Initial Password Entered
 
@@ -42,6 +57,10 @@ public class SignUpFormActivity extends AppCompatActivity implements View.OnClic
         setContentView(R.layout.activity_sign_up_form);
 
         mAuth = FirebaseAuth.getInstance();
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        mDatabaseRef = database.getReference(DB_CHILD);
+        mStorageRef = FirebaseStorage.getInstance().getReference().child(NAME_OF_FOLDER_FOR_PROFILEPIC);
+
         mAuthStateListener = new FirebaseAuth.AuthStateListener()
         {
             @Override
@@ -68,8 +87,9 @@ public class SignUpFormActivity extends AppCompatActivity implements View.OnClic
         mLname = (EditText) findViewById(R.id.actuaLname);
         mEmail = (EditText) findViewById(R.id.actualEmail);
         mPassword = (EditText) findViewById(R.id.actualPW);
-        mProfilePictureButton = (ImageButton) findViewById(R.id.profilePicture);
+        mProfilePictureButton = (ImageButton) findViewById(R.id.proPicBut);
         mRegisterButton = (Button) findViewById(R.id.saveInfo);
+        mTempLogoutButton = (Button) findViewById(R.id.tempSignOutButton);
     }
 
     @Override
@@ -85,6 +105,7 @@ public class SignUpFormActivity extends AppCompatActivity implements View.OnClic
         super.onResume();
         mProfilePictureButton.setOnClickListener(this);
         mRegisterButton.setOnClickListener(this);
+        mTempLogoutButton.setOnClickListener(this);
     }
 
     @Override
@@ -102,7 +123,7 @@ public class SignUpFormActivity extends AppCompatActivity implements View.OnClic
         int id = v.getId();
         switch (id)
         {
-            case R.id.profilePicture:
+            case R.id.proPicBut:
                 Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT);
                 galleryIntent.setType("image/*");
                 startActivityForResult(galleryIntent, GALLERY_REQUEST_CODE);
@@ -114,18 +135,54 @@ public class SignUpFormActivity extends AppCompatActivity implements View.OnClic
                 String password = mPassword.getText().toString().trim();
                 doRegistration(fName, lName, email, password, v);
                 break;
+            case R.id.tempSignOutButton:
+                signOut();
+                break;
         }
     }
 
-    private void doRegistration(String fName, String lName, String email, String password, View v)
+    private void doRegistration(final String fName, final String lName, final String email, final String password, View v)
     {
+        final View view = v;
         if (!isValid(fName, lName, email, password))
         {
-            return;
+            Log.d(TAG, "doRegistration: Unable To Sign Up");
         }
         else
         {
-            Log.d(TAG, "doRegistration: we are able to sign up");
+            mAuth.createUserWithEmailAndPassword(email, password)
+                    .addOnCompleteListener(this, new OnCompleteListener<AuthResult>()
+                    {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task)
+                        {
+                            if (task.isSuccessful())
+                            {
+                                Log.d(TAG, "onComplete: SuccessFully Created Account: " + task.getResult().getUser().getEmail());
+                                final String userUID = task.getResult().getUser().getUid();
+                                if (mImageUri != null)
+                                {
+                                    StorageReference profilePicRefPath = mStorageRef.child(email + "-" + userUID);
+                                    profilePicRefPath.putFile(mImageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>()
+                                    {
+                                        @Override
+                                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot)
+                                        {
+                                            Uri profilePicUri = taskSnapshot.getDownloadUrl();
+                                            User user = new User(fName, lName, email, userUID, profilePicUri.toString());
+                                            mDatabaseRef.push().setValue(user);
+                                            Snackbar.make(view, "Welcome:" + fName + " " + lName, Snackbar.LENGTH_SHORT).show();
+                                        }
+                                    });
+                                }
+                                else if (mImageUri == null)
+                                {
+                                    User user = new User(fName, lName, email, userUID, null);
+                                    mDatabaseRef.push().setValue(user);
+                                }
+                            }
+                        }
+                    });
         }
     }
 
@@ -168,7 +225,7 @@ public class SignUpFormActivity extends AppCompatActivity implements View.OnClic
         if (TextUtils.isEmpty(password) || password.length() < passwordLimit)
         {
             //TODO:Validate Password Characters So That It Contains At Least Some Other Character Or Capital Letter
-            mPassword.setError("Please Enter A Longer Password");
+            mPassword.setError(getString(R.string.longer_than_eight));
             valid = false;
         }
         else
@@ -189,5 +246,10 @@ public class SignUpFormActivity extends AppCompatActivity implements View.OnClic
             Log.d(TAG, "onActivityResult: " + mImageUri.toString());
             mProfilePictureButton.setImageURI(mImageUri);
         }
+    }
+
+    private void signOut()
+    {
+        mAuth.signOut();
     }
 }

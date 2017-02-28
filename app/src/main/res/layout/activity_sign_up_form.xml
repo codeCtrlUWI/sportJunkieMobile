@@ -8,23 +8,6 @@
     android:layout_height="match_parent"
     tools:context="com.example.renadoparia.sportjunkiem.SignUpFormActivity">
 
-    <ImageButton
-        android:id="@+id/profilePicture"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:adjustViewBounds="true"
-        android:scaleType="fitCenter"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/com_facebook_profile_picture_blank_square"
-        />
-
     <Button
         android:id="@+id/saveInfo"
         style="@style/Widget.AppCompat.Button.Colored"
@@ -35,11 +18,12 @@
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
         android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
         android:text="Register"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        />
+        app:layout_constraintTop_toBottomOf="@+id/actualPW"/>
 
     <TextView
         android:id="@+id/fNameTv"
@@ -60,14 +44,14 @@
         android:layout_marginLeft="8dp"
         android:layout_marginRight="16dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="24dp"
         android:ems="10"
         android:hint="Sarah"
         android:inputType="textPersonName"
         android:textColor="@color/colorPrimaryText"
         app:layout_constraintLeft_toRightOf="@+id/fNameTv"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/profilePicture"/>
+        app:layout_constraintTop_toBottomOf="@+id/propic"/>
 
     <EditText
         android:id="@+id/actuaLname"
@@ -109,6 +93,7 @@
         android:hint="johndoe@mail.com"
         android:inputType="textEmailAddress"
         android:textColor="@color/colorPrimaryText"
+        app:layout_constraintLeft_toLeftOf="@+id/actuaLname"
         app:layout_constraintRight_toRightOf="@+id/actuaLname"
         app:layout_constraintTop_toBottomOf="@+id/actuaLname"/>
 
@@ -132,5 +117,31 @@
         app:layout_constraintLeft_toLeftOf="@+id/actualEmail"
         app:layout_constraintRight_toRightOf="@+id/actualEmail"
         app:layout_constraintTop_toBottomOf="@+id/actualEmail"/>
+
+    <include
+        android:id="@+id/propic"
+        layout="@layout/profile_picture"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <Button
+        android:id="@+id/tempSignOutButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginStart="8dp"
+        android:text="TempSignOut"
+        app:layout_constraintBaseline_toBaselineOf="@+id/saveInfo"
+        app:layout_constraintLeft_toRightOf="@+id/saveInfo"
+        app:layout_constraintRight_toRightOf="parent"/>
 
 </android.support.constraint.ConstraintLayout>
