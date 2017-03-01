@@ -25,6 +25,7 @@
         app:layout_constraintTop_toTopOf="parent"/>
 
     <include
+        android:id="@+id/include3"
         layout="@layout/auth_buttons_signin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -39,5 +40,21 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/include"
         app:layout_constraintVertical_bias="0.7"/>
+
+    <Button
+        android:id="@+id/tempsineout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:text="SineOut"
+        app:layout_constraintBottom_toTopOf="@+id/include3"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/include"/>
 
 </android.support.constraint.ConstraintLayout>

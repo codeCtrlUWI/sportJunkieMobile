@@ -350,5 +350,6 @@ public class SignUpFormActivity extends AppCompatActivity implements View.OnClic
     private void signOut()
     {
         mAuth.signOut();
+
     }
 }

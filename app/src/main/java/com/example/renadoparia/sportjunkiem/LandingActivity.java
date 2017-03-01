@@ -2,14 +2,38 @@ package com.example.renadoparia.sportjunkiem;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
-public class LandingActivity extends AppCompatActivity implements View.OnClickListener
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.auth.api.signin.GoogleSignInResult;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GoogleAuthProvider;
+
+public class LandingActivity extends AppCompatActivity implements
+        View.OnClickListener,
+        GoogleApiClient.OnConnectionFailedListener
 {
     private static final String TAG = "LandingActivity";
+    private static final int RC_SIGN_IN = 1738;
 
+    private FirebaseAuth mAuth;
+    private FirebaseAuth.AuthStateListener mAuthStateListener;
+    private GoogleApiClient mGoogleApiClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -19,7 +43,53 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         setContentView(R.layout.activity_landing);
         //Initialize Buttons
         initalizeWidgets();
+
+        GoogleSignInOptions googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build();
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(this, this)
+                .addApi(Auth.GOOGLE_SIGN_IN_API, googleSignInOptions)
+                .build();
+
+
+        mAuth = FirebaseAuth.getInstance();
+        mAuthStateListener = new FirebaseAuth.AuthStateListener()
+        {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth)
+            {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                if (user != null)
+                {
+                    //TODO:Add Redirection
+                    Log.d(TAG, "onAuthStateChanged: User is Signed In: " + user.getEmail());
+                }
+                else
+                {
+                    Log.d(TAG, "onAuthStateChanged: User Is Not Signed In");
+                }
+            }
+        };
         Log.d(TAG, "onCreate: ends");
+    }
+
+    @Override
+    protected void onStart()
+    {
+        super.onStart();
+        mAuth.addAuthStateListener(mAuthStateListener);
+    }
+
+    @Override
+    protected void onStop()
+    {
+        super.onStop();
+        if (mAuthStateListener != null)
+        {
+            mAuth.removeAuthStateListener(mAuthStateListener);
+        }
     }
 
     private void initalizeWidgets()
@@ -27,6 +97,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         findViewById(R.id.email_signin_button).setOnClickListener(this);
         findViewById(R.id.google_signin_button).setOnClickListener(this);
         findViewById(R.id.hasNoAcc).setOnClickListener(this);
+        findViewById(R.id.tempsineout).setOnClickListener(this);
     }
 
     @Override
@@ -40,13 +111,78 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 startActivity(intent);
                 break;
             case R.id.google_signin_button:
+                googleSignIn();
                 break;
             case R.id.hasNoAcc:
                 Intent signUpForAcc = new Intent(getApplicationContext(), SignUpFormActivity.class);
                 startActivity(signUpForAcc);
                 break;
+            case R.id.tempsineout:
+                signOut();
+                break;
         }
+    }
 
+    private void signOut()
+    {
+        mAuth.signOut();
 
+        Auth.GoogleSignInApi.signOut(mGoogleApiClient)
+                .setResultCallback(new ResultCallback<Status>()
+                {
+                    @Override
+                    public void onResult(@NonNull Status status)
+                    {
+                        Log.d(TAG, "onResult: logged Out" + status.getStatusMessage());
+                    }
+                });
+    }
+
+    private void googleSignIn()
+    {
+        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+        startActivityForResult(signInIntent, RC_SIGN_IN);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == RC_SIGN_IN)
+        {
+            GoogleSignInResult googleSignInResult = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+            if (googleSignInResult.isSuccess())
+            {
+                GoogleSignInAccount googleSignInAccount = googleSignInResult.getSignInAccount();
+                fireBaseAuthWithGoogle(googleSignInAccount);
+            }
+        }
+        else
+        {
+            //Do Something To UI here
+        }
+    }
+
+    private void fireBaseAuthWithGoogle(GoogleSignInAccount googleSignInAccount)
+    {
+        Log.d(TAG, "fireBaseAuthWithGoogle: " + googleSignInAccount.getId());
+        AuthCredential credential = GoogleAuthProvider.getCredential(googleSignInAccount.getIdToken(), null);
+        mAuth.signInWithCredential(credential)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>()
+                {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task)
+                    {
+                        Log.d(TAG, "onComplete: " + task.isSuccessful());
+                        Log.d(TAG, "onComplete: Signed In With Google");
+                    }
+                });
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult)
+    {
+        Log.d(TAG, "onConnectionFailed: " + connectionResult.toString());
+        Toast.makeText(getApplicationContext(), "Google Error", Toast.LENGTH_LONG).show();
     }
 }
