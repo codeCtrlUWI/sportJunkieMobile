@@ -95,7 +95,7 @@ public class SignInEmailFormActivity extends AppCompatActivity implements View.O
             case R.id.hasNoAccount:
                 /*Maybe i Could Add a putExtra here, in the case of the user is an idiot and try to sign in without an account,
                 * I can take the email, pass it through to the sign up in EMail Activity and put it there For him to use*/
-                Intent intent = new Intent(getApplicationContext(), SignUpOptionActivity.class);
+                Intent intent = new Intent(getApplicationContext(), SignUpFormActivity.class);
                 startActivity(intent);
                 break;
         }

@@ -31,11 +31,14 @@ import com.google.firebase.storage.UploadTask;
 
 import java.util.UUID;
 
+import static com.example.renadoparia.sportjunkiem.R.drawable.placeholder_person;
+
 public class SignUpFormActivity extends AppCompatActivity implements View.OnClickListener
 {
     private static final String TAG = "SignUpFormActivity";
     private static final String DB_CHILD = "USERS";
     private static final String NAME_OF_FOLDER_FOR_PROFILEPIC = "Profile Pictures";
+    private static final String PLACEHOLDER_IMAGE = "placeholder_person.png";
 
     private static final int GALLERY_REQUEST_CODE = 1;
 
@@ -173,7 +176,7 @@ public class SignUpFormActivity extends AppCompatActivity implements View.OnClic
                 signOut();
                 break;
             case R.id.clearPhoto:
-                mProfilePictureButton.setImageResource(R.drawable.placeholder_person);
+                mProfilePictureButton.setImageResource(placeholder_person);
                 // mImageUri = resourceToUri(getApplicationContext(), R.drawable.placeholder_person);
                 mImageUri = null;
                 break;
@@ -227,7 +230,7 @@ public class SignUpFormActivity extends AppCompatActivity implements View.OnClic
                                 }
                                 else if (mImageUri == null)
                                 {
-                                    StorageReference getDefaultProfilePic = mStorageRef.child("placeholder_person.png");
+                                    StorageReference getDefaultProfilePic = mStorageRef.child(PLACEHOLDER_IMAGE);
                                     getDefaultProfilePic.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>()
                                     {
                                         @Override
@@ -244,7 +247,7 @@ public class SignUpFormActivity extends AppCompatActivity implements View.OnClic
                                         {
                                             Log.d(TAG, "onFailure: Failure To Retrieve URL");
                                             /*If For Some Weird Reason, The File Is Not In Storage, I Am Manually uploading from the drawable*/
-                                            final Uri appBasedImage = resourceToUri(getApplicationContext(), R.drawable.placeholder_person);
+                                            final Uri appBasedImage = resourceToUri(getApplicationContext(), placeholder_person);
                                             StorageReference putDefaultpic = mStorageRef.child("placeholder_person.png");
                                             putDefaultpic.putFile(appBasedImage).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>()
                                             {
