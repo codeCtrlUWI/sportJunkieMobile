@@ -180,6 +180,7 @@ public class SignUpFormActivity extends AppCompatActivity implements View.OnClic
         }
     }
 
+    /*I Should Refactor This Code Some more, Cause why the fuck not*/
     private void doRegistration(final String fName, final String lName, final String email, final String password, View v)
     {
         final View view = v;
@@ -212,7 +213,7 @@ public class SignUpFormActivity extends AppCompatActivity implements View.OnClic
                                             Uri profilePicUri = taskSnapshot.getDownloadUrl();
                                             User user = new User(fName, lName, email, userUID, profilePicUri.toString());
                                             mDatabaseRef.push().setValue(user);
-                                            Snackbar.make(view, "Welcome:" + fName + " " + lName, Snackbar.LENGTH_SHORT).show();
+                                            Snackbar.make(view, "Welcome: " + fName + " " + lName, Snackbar.LENGTH_LONG).show();
                                         }
                                     }).addOnFailureListener(new OnFailureListener()
                                     {
@@ -234,6 +235,7 @@ public class SignUpFormActivity extends AppCompatActivity implements View.OnClic
                                         {
                                             User user = new User(fName, lName, email, userUID, uri.toString());
                                             mDatabaseRef.push().setValue(user);
+                                            Snackbar.make(view, "Welcome: " + fName + " " + lName, Snackbar.LENGTH_LONG).show();
                                         }
                                     }).addOnFailureListener(new OnFailureListener()
                                     {
@@ -251,6 +253,7 @@ public class SignUpFormActivity extends AppCompatActivity implements View.OnClic
                                                 {
                                                     User user = new User(fName, lName, email, userUID, appBasedImage.toString());
                                                     mDatabaseRef.push().setValue(user);
+                                                    Snackbar.make(view, "Welcome: " + fName + " " + lName, Snackbar.LENGTH_LONG).show();
                                                 }
                                             }).addOnFailureListener(new OnFailureListener()
                                             {
@@ -328,7 +331,6 @@ public class SignUpFormActivity extends AppCompatActivity implements View.OnClic
         }
         return valid;
     }
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
