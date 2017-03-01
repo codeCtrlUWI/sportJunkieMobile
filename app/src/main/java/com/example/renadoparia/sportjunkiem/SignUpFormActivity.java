@@ -1,5 +1,7 @@
 package com.example.renadoparia.sportjunkiem;
 
+import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -15,6 +17,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -25,6 +28,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+
+import java.util.UUID;
 
 public class SignUpFormActivity extends AppCompatActivity implements View.OnClickListener
 {
@@ -40,7 +45,8 @@ public class SignUpFormActivity extends AppCompatActivity implements View.OnClic
     private EditText mPassword;
     private ImageButton mProfilePictureButton;
     private Button mRegisterButton;
-    private Button mTempLogoutButton;
+    private Button mTempLogoutButton;//A Temporary Testing Button To Logout;
+    private Button mClearPhotoButton;
     private Uri mImageUri;
 
     private FirebaseAuth mAuth;
@@ -49,6 +55,18 @@ public class SignUpFormActivity extends AppCompatActivity implements View.OnClic
     private StorageReference mStorageRef;
 
     //TODO: Add Confirmation Password Field, Then Check To See if It's Valid against Initial Password Entered
+    //TODO: Consider Offline Storage
+    //TODO: Check For Internet Connection
+    //TODO:Add Ability To Clear Individual Text Fields With The Tap Of A Button
+
+    // http://stackoverflow.com/questions/4896223/how-to-get-an-uri-of-an-image-resource-in-android
+    private static Uri resourceToUri(Context context, int resID)
+    {
+        return Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" +
+                context.getResources().getResourcePackageName(resID) + '/' +
+                context.getResources().getResourceTypeName(resID) + '/' +
+                context.getResources().getResourceEntryName(resID));
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -69,6 +87,7 @@ public class SignUpFormActivity extends AppCompatActivity implements View.OnClic
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null)
                 {
+                    //TODO:Add Redirection
                     Log.d(TAG, "onAuthStateChanged: User is Signed In: " + user.getEmail());
                 }
                 else
@@ -90,6 +109,20 @@ public class SignUpFormActivity extends AppCompatActivity implements View.OnClic
         mProfilePictureButton = (ImageButton) findViewById(R.id.proPicBut);
         mRegisterButton = (Button) findViewById(R.id.saveInfo);
         mTempLogoutButton = (Button) findViewById(R.id.tempSignOutButton);
+        mClearPhotoButton = (Button) findViewById(R.id.clearPhoto);
+
+
+        /*Setting Default URI To PlaceHolder Image, So If the user does not select an image to post,
+        * their default will be a placeholder image*/
+
+        /*Another option if a user does not select an image is to set their imageURL
+        * in the database entry to some arbitray constant, that way, the field will exists in the db,
+        * even if they don't select an image(unlike, if you put null, the db doesn't consider the field),
+        **/
+
+        /*Come back to this option, When doing the update option(When they edit their credentials)*/
+        //  mImageUri = resourceToUri(getApplicationContext(), R.drawable.placeholder_person);
+        mImageUri = null;
     }
 
     @Override
@@ -106,6 +139,7 @@ public class SignUpFormActivity extends AppCompatActivity implements View.OnClic
         mProfilePictureButton.setOnClickListener(this);
         mRegisterButton.setOnClickListener(this);
         mTempLogoutButton.setOnClickListener(this);
+        mClearPhotoButton.setOnClickListener(this);
     }
 
     @Override
@@ -138,6 +172,11 @@ public class SignUpFormActivity extends AppCompatActivity implements View.OnClic
             case R.id.tempSignOutButton:
                 signOut();
                 break;
+            case R.id.clearPhoto:
+                mProfilePictureButton.setImageResource(R.drawable.placeholder_person);
+                // mImageUri = resourceToUri(getApplicationContext(), R.drawable.placeholder_person);
+                mImageUri = null;
+                break;
         }
     }
 
@@ -162,7 +201,9 @@ public class SignUpFormActivity extends AppCompatActivity implements View.OnClic
                                 final String userUID = task.getResult().getUser().getUid();
                                 if (mImageUri != null)
                                 {
-                                    StorageReference profilePicRefPath = mStorageRef.child(email + "-" + userUID);
+                                    Log.d(TAG, "onComplete: imageURI: " + mImageUri.toString());
+                                    StorageReference profilePicRefPath =
+                                            mStorageRef.child(email + "-" + userUID + "-" + UUID.randomUUID().toString());
                                     profilePicRefPath.putFile(mImageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>()
                                     {
                                         @Override
@@ -173,14 +214,67 @@ public class SignUpFormActivity extends AppCompatActivity implements View.OnClic
                                             mDatabaseRef.push().setValue(user);
                                             Snackbar.make(view, "Welcome:" + fName + " " + lName, Snackbar.LENGTH_SHORT).show();
                                         }
+                                    }).addOnFailureListener(new OnFailureListener()
+                                    {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e)
+                                        {
+                                            Log.d(TAG, "onFailure: Failed To Upload");
+                                            e.printStackTrace();
+                                        }
                                     });
                                 }
                                 else if (mImageUri == null)
                                 {
-                                    User user = new User(fName, lName, email, userUID, null);
-                                    mDatabaseRef.push().setValue(user);
+                                    StorageReference getDefaultProfilePic = mStorageRef.child("placeholder_person.png");
+                                    getDefaultProfilePic.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>()
+                                    {
+                                        @Override
+                                        public void onSuccess(Uri uri)
+                                        {
+                                            User user = new User(fName, lName, email, userUID, uri.toString());
+                                            mDatabaseRef.push().setValue(user);
+                                        }
+                                    }).addOnFailureListener(new OnFailureListener()
+                                    {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e)
+                                        {
+                                            Log.d(TAG, "onFailure: Failure To Retrieve URL");
+                                            /*If For Some Weird Reason, The File Is Not In Storage, I Am Manually uploading from the drawable*/
+                                            final Uri appBasedImage = resourceToUri(getApplicationContext(), R.drawable.placeholder_person);
+                                            StorageReference putDefaultpic = mStorageRef.child("placeholder_person.png");
+                                            putDefaultpic.putFile(appBasedImage).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>()
+                                            {
+                                                @Override
+                                                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot)
+                                                {
+                                                    User user = new User(fName, lName, email, userUID, appBasedImage.toString());
+                                                    mDatabaseRef.push().setValue(user);
+                                                }
+                                            }).addOnFailureListener(new OnFailureListener()
+                                            {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e)
+                                                {
+                                                    //Ok, Fuck It All, You Don't wanna work, fuck it all
+                                                }
+                                            });
+
+                                            e.printStackTrace();
+                                        }
+                                    });
+
                                 }
                             }
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener()
+                    {
+                        @Override
+                        public void onFailure(@NonNull Exception e)
+                        {
+                            e.printStackTrace();
                         }
                     });
         }
