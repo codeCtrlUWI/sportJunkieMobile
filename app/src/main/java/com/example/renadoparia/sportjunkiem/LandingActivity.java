@@ -42,7 +42,8 @@ public class LandingActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_landing);
         //Initialize Buttons
-        initalizeWidgets();
+        initializeWidgets();
+        makeFullScreen();
 
         GoogleSignInOptions googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
@@ -64,6 +65,7 @@ public class LandingActivity extends AppCompatActivity implements
                 if (user != null)
                 {
                     //TODO:Add Redirection
+                    Toast.makeText(getApplicationContext(), "Name: " + user.getDisplayName(), Toast.LENGTH_LONG).show();
                     Log.d(TAG, "onAuthStateChanged: User is Signed In: " + user.getEmail());
                 }
                 else
@@ -73,6 +75,32 @@ public class LandingActivity extends AppCompatActivity implements
             }
         };
         Log.d(TAG, "onCreate: ends");
+    }
+
+    private void makeFullScreen()
+    {
+        final View decorView = getWindow().getDecorView();
+        final int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
+        decorView.setSystemUiVisibility(uiOptions);
+        decorView.setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener()
+        {
+            @Override
+            public void onSystemUiVisibilityChange(int visibility)
+            {
+                if ((visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) == 0)
+                {
+                    decorView.setSystemUiVisibility(uiOptions);
+                }
+            }
+        });
+    }
+
+    private void initializeWidgets()
+    {
+        findViewById(R.id.email_signin_button).setOnClickListener(this);
+        findViewById(R.id.google_signin_button).setOnClickListener(this);
+        findViewById(R.id.hasNoAcc).setOnClickListener(this);
+        // findViewById(R.id.tempsineout).setOnClickListener(this);
     }
 
     @Override
@@ -92,14 +120,6 @@ public class LandingActivity extends AppCompatActivity implements
         }
     }
 
-    private void initalizeWidgets()
-    {
-        findViewById(R.id.email_signin_button).setOnClickListener(this);
-        findViewById(R.id.google_signin_button).setOnClickListener(this);
-        findViewById(R.id.hasNoAcc).setOnClickListener(this);
-        findViewById(R.id.tempsineout).setOnClickListener(this);
-    }
-
     @Override
     public void onClick(View v)
     {
@@ -117,9 +137,9 @@ public class LandingActivity extends AppCompatActivity implements
                 Intent signUpForAcc = new Intent(getApplicationContext(), SignUpFormActivity.class);
                 startActivity(signUpForAcc);
                 break;
-            case R.id.tempsineout:
-                signOut();
-                break;
+//            case R.id.tempsineout:
+//                signOut();
+//                break;
         }
     }
 
@@ -133,7 +153,7 @@ public class LandingActivity extends AppCompatActivity implements
                     @Override
                     public void onResult(@NonNull Status status)
                     {
-                        Log.d(TAG, "onResult: logged Out" + status.getStatusMessage());
+                        Log.d(TAG, "onResult: " + status.getStatus().toString());
                     }
                 });
     }
@@ -173,10 +193,20 @@ public class LandingActivity extends AppCompatActivity implements
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task)
                     {
-                        Log.d(TAG, "onComplete: " + task.isSuccessful());
-                        Log.d(TAG, "onComplete: Signed In With Google");
+                        if (task.isSuccessful())
+                        {
+                            Log.d(TAG, "onComplete: signed in complete ");
+                            Log.d(TAG, "onComplete: Name: " + task.getResult().getUser().getDisplayName());
+                            Log.d(TAG, "onComplete: Email:" + task.getResult().getUser().getEmail());
+                            Log.d(TAG, "onComplete: Photo URL: " + task.getResult().getUser().getPhotoUrl());
+                        }
+                        else
+                        {
+                            Log.d(TAG, "onComplete: signed in not complete");
+                        }
                     }
                 });
+        Log.d(TAG, "fireBaseAuthWithGoogle: ends");
     }
 
     @Override

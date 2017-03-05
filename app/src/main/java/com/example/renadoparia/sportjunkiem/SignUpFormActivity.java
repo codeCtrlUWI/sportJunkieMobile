@@ -1,12 +1,17 @@
 package com.example.renadoparia.sportjunkiem;
 
+
+import android.Manifest;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
@@ -15,6 +20,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -39,7 +45,7 @@ public class SignUpFormActivity extends AppCompatActivity implements View.OnClic
     private static final String DB_CHILD = "USERS";
     private static final String NAME_OF_FOLDER_FOR_PROFILEPIC = "Profile Pictures";
     private static final String PLACEHOLDER_IMAGE = "placeholder_person.png";
-
+    private static final int PERMISSION_REQUEST_IMAGE_GALLERY = 1765;
     private static final int GALLERY_REQUEST_CODE = 1;
 
     private EditText mFname;
@@ -76,11 +82,11 @@ public class SignUpFormActivity extends AppCompatActivity implements View.OnClic
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up_form);
-
         mAuth = FirebaseAuth.getInstance();
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         mDatabaseRef = database.getReference(DB_CHILD);
         mStorageRef = FirebaseStorage.getInstance().getReference().child(NAME_OF_FOLDER_FOR_PROFILEPIC);
+
 
         mAuthStateListener = new FirebaseAuth.AuthStateListener()
         {
@@ -161,6 +167,7 @@ public class SignUpFormActivity extends AppCompatActivity implements View.OnClic
         switch (id)
         {
             case R.id.proPicBut:
+                galleryImagePermissionRequest();
                 Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT);
                 galleryIntent.setType("image/*");
                 startActivityForResult(galleryIntent, GALLERY_REQUEST_CODE);
@@ -254,7 +261,8 @@ public class SignUpFormActivity extends AppCompatActivity implements View.OnClic
                                                 @Override
                                                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot)
                                                 {
-                                                    User user = new User(fName, lName, email, userUID, appBasedImage.toString());
+                                                    Uri appBasedimg = taskSnapshot.getDownloadUrl();
+                                                    User user = new User(fName, lName, email, userUID, appBasedimg.toString());
                                                     mDatabaseRef.push().setValue(user);
                                                     Snackbar.make(view, "Welcome: " + fName + " " + lName, Snackbar.LENGTH_LONG).show();
                                                 }
@@ -285,6 +293,8 @@ public class SignUpFormActivity extends AppCompatActivity implements View.OnClic
                     });
         }
     }
+
+    //TODO:When user is registering, check if their email is arleady in the database,that means, that their account was already created
 
     private boolean isValid(String fName, String lName, String email, String password)
     {
@@ -335,21 +345,59 @@ public class SignUpFormActivity extends AppCompatActivity implements View.OnClic
         return valid;
     }
 
+    private void galleryImagePermissionRequest()
+    {
+        String permission = Manifest.permission.READ_EXTERNAL_STORAGE;
+        if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED)
+        {
+           /* if (ActivityCompat.shouldShowRequestPermissionRationale(this, permission))
+            {
+                ActivityCompat.requestPermissions(this, new String[]{permission}, PERMISSION_REQUEST_IMAGE_GALLERY);
+            }*/
+            ActivityCompat.requestPermissions(this,
+                    new String[]{permission},
+                    PERMISSION_REQUEST_IMAGE_GALLERY);
+
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
+    {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode)
+        {
+            case PERMISSION_REQUEST_IMAGE_GALLERY:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                {
+                    Toast.makeText(getApplicationContext(), "Permission For" + permissions[0] + "Granted", Toast.LENGTH_LONG).show();
+                }
+                break;
+        }
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == GALLERY_REQUEST_CODE && resultCode == RESULT_OK)
         {
-            mImageUri = data.getData();
-            Log.d(TAG, "onActivityResult: " + mImageUri.toString());
-            mProfilePictureButton.setImageURI(mImageUri);
+            try
+            {
+                mImageUri = data.getData();
+                Log.d(TAG, "onActivityResult: " + mImageUri.toString());
+                mProfilePictureButton.setImageURI(mImageUri);
+            }
+            catch (Exception e)
+            {
+                Log.e(TAG, "onActivityResult: " + e.getMessage());
+                e.printStackTrace();
+            }
         }
     }
 
     private void signOut()
     {
         mAuth.signOut();
-
     }
 }

@@ -6,117 +6,108 @@
     android:id="@+id/activity_sign_up_form"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.renadoparia.sportjunkiem.SignUpFormActivity">
+    android:background="@drawable/lgb2_blur"
+    tools:context="com.example.renadoparia.sportjunkiem.SignUpFormActivity"
+    tools:layout_editor_absoluteX="0dp"
+    tools:layout_editor_absoluteY="25dp">
 
     <Button
         android:id="@+id/saveInfo"
         style="@style/Widget.AppCompat.Button.Colored"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="60dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
         android:text="Register"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/actualPW"/>
-
-    <TextView
-        android:id="@+id/fNameTv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginStart="16dp"
-        android:text="First Name:"
-        android:textColor="@color/colorPrimaryText"
-        app:layout_constraintBaseline_toBaselineOf="@+id/actualFname"
-        app:layout_constraintLeft_toLeftOf="parent"/>
+        app:layout_constraintRight_toLeftOf="@+id/tempSignOutButton"
+        tools:layout_constraintBottom_creator="1"
+        tools:layout_constraintRight_creator="1"/>
 
     <EditText
         android:id="@+id/actualFname"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
+        android:layout_marginEnd="8dp"
         android:layout_marginLeft="8dp"
-        android:layout_marginRight="16dp"
+        android:layout_marginRight="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="56dp"
         android:ems="10"
-        android:hint="Sarah"
+        android:hint="@string/your_first_name"
         android:inputType="textPersonName"
-        android:textColor="@color/colorPrimaryText"
-        app:layout_constraintLeft_toRightOf="@+id/fNameTv"
+        android:padding="10dp"
+        android:textColor="@color/whitetitey"
+        android:textColorHint="@color/whitetitey"
+        android:textStyle="bold"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/propic"/>
+        app:layout_constraintTop_toBottomOf="@+id/propic"
+        tools:layout_constraintLeft_creator="1"
+        tools:layout_constraintRight_creator="1"
+        tools:layout_constraintTop_creator="1"/>
 
     <EditText
         android:id="@+id/actuaLname"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:ems="10"
-        android:hint="Masters"
+        android:hint="Your Last Name"
         android:inputType="textPersonName"
-        android:textColor="@color/colorPrimaryText"
+        android:padding="10dp"
+        android:textColor="@color/whitetitey"
+        android:textColorHint="@color/whitetitey"
+        android:textStyle="bold"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toLeftOf="@+id/actualFname"
         app:layout_constraintRight_toRightOf="@+id/actualFname"
-        app:layout_constraintTop_toBottomOf="@+id/actualFname"/>
-
-    <TextView
-        android:id="@+id/LNameTv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Last Name:"
-        android:textColor="@color/colorPrimaryText"
-        app:layout_constraintBaseline_toBaselineOf="@+id/actuaLname"
-        app:layout_constraintLeft_toLeftOf="@+id/fNameTv"/>
-
-    <TextView
-        android:id="@+id/emaiLTv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Email:"
-        android:textColor="@color/colorPrimaryText"
-        app:layout_constraintBaseline_toBaselineOf="@+id/actualEmail"
-        app:layout_constraintLeft_toLeftOf="@+id/LNameTv"/>
+        app:layout_constraintTop_toBottomOf="@+id/actualFname"
+        tools:layout_constraintLeft_creator="1"
+        tools:layout_constraintRight_creator="1"/>
 
     <EditText
         android:id="@+id/actualEmail"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginRight="0dp"
         android:layout_marginTop="16dp"
         android:ems="10"
-        android:hint="johndoe@mail.com"
+        android:hint="youremail@examplemail.com"
         android:inputType="textEmailAddress"
-        android:textColor="@color/colorPrimaryText"
+        android:padding="10dp"
+        android:textColor="@color/whitetitey"
+        android:textColorHint="@color/whitetitey"
+        android:textStyle="bold"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintLeft_toLeftOf="@+id/actuaLname"
         app:layout_constraintRight_toRightOf="@+id/actuaLname"
-        app:layout_constraintTop_toBottomOf="@+id/actuaLname"/>
-
-    <TextView
-        android:id="@+id/passwordTv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Password:"
-        android:textColor="@color/colorPrimaryText"
-        app:layout_constraintBaseline_toBaselineOf="@+id/actualPW"
-        app:layout_constraintLeft_toLeftOf="@+id/emaiLTv"/>
+        app:layout_constraintTop_toBottomOf="@+id/actuaLname"
+        tools:layout_constraintLeft_creator="1"
+        tools:layout_constraintRight_creator="1"/>
 
     <EditText
         android:id="@+id/actualPW"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:ems="10"
+        android:hint="Enter Password here"
         android:inputType="textPassword"
-        android:textColor="@color/colorPrimaryText"
+        android:padding="10dp"
+        android:selectAllOnFocus="true"
+        android:text="Enter Password here"
+        android:textColor="@color/whitetitey"
+        android:textColorHint="@color/whitetitey"
+        android:textStyle="bold"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toLeftOf="@+id/actualEmail"
         app:layout_constraintRight_toRightOf="@+id/actualEmail"
-        app:layout_constraintTop_toBottomOf="@+id/actualEmail"/>
+        app:layout_constraintTop_toBottomOf="@+id/actualEmail"
+        tools:layout_constraintLeft_creator="1"
+        tools:layout_constraintRight_creator="1"/>
 
     <include
         android:id="@+id/propic"
@@ -125,36 +116,42 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="8dp"
         android:layout_marginStart="8dp"
+        android:layout_marginTop="6dp"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_constraintLeft_creator="1"
+        tools:layout_constraintTop_creator="1"/>
 
     <Button
         android:id="@+id/tempSignOutButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginStart="8dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginRight="24dp"
         android:text="TempSignOut"
         app:layout_constraintBaseline_toBaselineOf="@+id/saveInfo"
-        app:layout_constraintLeft_toRightOf="@+id/saveInfo"
-        app:layout_constraintRight_toRightOf="parent"/>
+        app:layout_constraintRight_toRightOf="parent"
+        tools:layout_constraintBaseline_creator="1"
+        tools:layout_constraintRight_creator="1"/>
 
     <Button
         android:id="@+id/clearPhoto"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginBottom="102dp"
+        android:layout_marginEnd="40dp"
+        android:layout_marginLeft="41dp"
+        android:layout_marginRight="40dp"
+        android:layout_marginStart="41dp"
+        android:layout_marginTop="103dp"
         android:text="Clear Image"
         app:layout_constraintBottom_toTopOf="@+id/actualFname"
         app:layout_constraintLeft_toRightOf="@+id/propic"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintRight_toRightOf="@+id/actualFname"
+        app:layout_constraintTop_toTopOf="@+id/propic"
+        tools:layout_constraintBottom_creator="1"
+        tools:layout_constraintLeft_creator="1"
+        tools:layout_constraintRight_creator="1"
+        tools:layout_constraintTop_creator="1"/>
 
 </android.support.constraint.ConstraintLayout>

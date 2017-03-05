@@ -6,39 +6,47 @@
     android:id="@+id/activity_sign_in_email_form"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/lgb2_blur"
     tools:context="com.example.renadoparia.sportjunkiem.SignInEmailFormActivity">
 
     <Button
         android:id="@+id/sineIn"
-        android:layout_width="395dp"
+        style="@style/Widget.AppCompat.Button.Colored"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
         android:layout_marginTop="16dp"
-        android:text="Sign In"
+        android:text="Log In"
+        android:textAllCaps="false"
+        android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="@+id/password"
         app:layout_constraintRight_toRightOf="@+id/password"
         app:layout_constraintTop_toBottomOf="@+id/password"
-        app:layout_constraintVertical_bias="0.0"/>
+        app:layout_constraintVertical_bias="0.0"
+        tools:layout_constraintLeft_creator="1"
+        tools:layout_constraintRight_creator="1"/>
 
     <EditText
         android:id="@+id/emale"
-        android:layout_width="395dp"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:ems="10"
         android:hint="Enter Email Here"
         android:inputType="textEmailAddress"
+        android:selectAllOnFocus="false"
+        android:textColor="#ffffff"
+        android:textColorHint="#ffffff"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/include2"
-        app:layout_constraintVertical_bias="0.19"/>
+        app:layout_constraintVertical_bias="0.211"
+        tools:layout_constraintLeft_creator="1"
+        tools:layout_constraintRight_creator="1"/>
 
     <EditText
         android:id="@+id/password"
@@ -48,24 +56,26 @@
         android:ems="10"
         android:hint="Password Here"
         android:inputType="textPassword"
+        android:textColor="@color/whitetitey"
+        android:textColorHint="@color/whitetitey"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintLeft_toLeftOf="@+id/emale"
         app:layout_constraintRight_toRightOf="@+id/emale"
-        app:layout_constraintTop_toBottomOf="@+id/emale"/>
+        app:layout_constraintTop_toBottomOf="@+id/emale"
+        tools:layout_constraintLeft_creator="1"
+        tools:layout_constraintRight_creator="1"/>
 
     <include
         android:id="@+id/include2"
         layout="@layout/include_header_and_logo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_constraintLeft_creator="1"
+        tools:layout_constraintRight_creator="1"/>
 
     <Button
         android:id="@+id/hasNoAccount"
@@ -75,9 +85,11 @@
         android:layout_marginTop="48dp"
         android:text="Sign Up For SportJunkie"
         android:textAllCaps="false"
-        android:textColor="@color/colorSecondaryText"
+        android:textColor="#ffffff"
         android:textSize="16sp"
         app:layout_constraintLeft_toLeftOf="@+id/sineIn"
         app:layout_constraintRight_toRightOf="@+id/sineIn"
-        app:layout_constraintTop_toBottomOf="@+id/sineIn"/>
+        app:layout_constraintTop_toBottomOf="@+id/sineIn"
+        tools:layout_constraintLeft_creator="1"
+        tools:layout_constraintRight_creator="1"/>
 </android.support.constraint.ConstraintLayout>

@@ -8,33 +8,29 @@
               android:weightSum="3">
 
 
-    <TextView
-        android:id="@+id/title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:text="@string/sport_junkie_title"
-        android:textAlignment="center"
-        android:textAppearance="@style/TextAppearance.AppCompat.Display2"/>
+    <!--<TextView-->
+    <!--android:id="@+id/titleapp"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:text="SportJunkie"-->
+    <!--android:textAlignment="center"-->
+    <!--android:textAllCaps="true"-->
+    <!--android:textColor="@color/colorPrimaryDark"-->
+    <!--android:textSize="56sp"-->
+    <!--android:textStyle="italic"/>-->
 
-
+    <!--<TextView-->
+    <!--android:id="@+id/subtitle"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:text="Get Your Fix HERE"-->
+    <!--android:textAlignment="center"-->
+    <!--android:textColor="@color/colorAccent"-->
+    <!--android:textSize="28sp"-->
+    <!--android:textStyle="bold|italic"/>-->
     <ImageView
-        android:id="@+id/placeHolderLogo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginEnd="16dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:contentDescription="@string/logo"
-        android:scaleType="fitCenter"
-        app:srcCompat="@drawable/ic_image_black_48dp"/>
-
-
+        android:id="@+id/imageView2"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        app:srcCompat="@drawable/sjwhiteresize"/>
 </LinearLayout>

@@ -36,6 +36,7 @@ public class SignInEmailFormActivity extends AppCompatActivity implements View.O
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in_email_form);
+        makeFullScreen();
         mAuth = FirebaseAuth.getInstance();
         mAuthStateListener = new FirebaseAuth.AuthStateListener()
         {
@@ -56,6 +57,25 @@ public class SignInEmailFormActivity extends AppCompatActivity implements View.O
             }
         };
         initializeWidgets();
+    }
+
+    /*Duplicated Code, Fix This later*/
+    private void makeFullScreen()
+    {
+        final View decorView = getWindow().getDecorView();
+        final int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
+        decorView.setSystemUiVisibility(uiOptions);
+        decorView.setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener()
+        {
+            @Override
+            public void onSystemUiVisibilityChange(int visibility)
+            {
+                if ((visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) == 0)
+                {
+                    decorView.setSystemUiVisibility(uiOptions);
+                }
+            }
+        });
     }
 
     private void initializeWidgets()
