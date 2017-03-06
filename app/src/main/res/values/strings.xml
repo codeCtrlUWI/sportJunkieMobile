@@ -9,5 +9,11 @@
     <string name="name_entry_limit">Name Must Be At Least 3 Characters</string>
     <string name="enter_valid_email">Please Enter A Valid Email</string>
     <string name="longer_than_eight">Password Must Be Longer Than 8 Characters</string>
-    <string name="your_first_name">Your First Name</string>
+    <string name="your_first_name">First Name</string>
+    <string name="enter_password_here">Password</string>
+    <string name="emailhint">Email</string>
+    <string name="lastnameprompts">Last Name</string>
+    <string name="register">Register</string>
+    <string name="sign_up_for_sportjunkie">Sign Up For SportJunkie</string>
+    <string name="log_in">Log In</string>
 </resources>

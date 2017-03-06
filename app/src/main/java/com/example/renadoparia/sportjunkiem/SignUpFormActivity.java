@@ -1,9 +1,9 @@
 package com.example.renadoparia.sportjunkiem;
 
-
 import android.Manifest;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -12,6 +12,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
@@ -47,6 +48,7 @@ public class SignUpFormActivity extends AppCompatActivity implements View.OnClic
     private static final String PLACEHOLDER_IMAGE = "placeholder_person.png";
     private static final int PERMISSION_REQUEST_IMAGE_GALLERY = 1765;
     private static final int GALLERY_REQUEST_CODE = 1;
+    private static final String PERMISSION_READ_EXTERNAL_STORAGE = Manifest.permission.READ_EXTERNAL_STORAGE;
 
     private EditText mFname;
     private EditText mLname;
@@ -54,7 +56,6 @@ public class SignUpFormActivity extends AppCompatActivity implements View.OnClic
     private EditText mPassword;
     private ImageButton mProfilePictureButton;
     private Button mRegisterButton;
-    private Button mTempLogoutButton;//A Temporary Testing Button To Logout;
     private Button mClearPhotoButton;
     private Uri mImageUri;
 
@@ -71,6 +72,7 @@ public class SignUpFormActivity extends AppCompatActivity implements View.OnClic
     // http://stackoverflow.com/questions/4896223/how-to-get-an-uri-of-an-image-resource-in-android
     private static Uri resourceToUri(Context context, int resID)
     {
+        Log.d(TAG, "resourceToUri: starts");
         return Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" +
                 context.getResources().getResourcePackageName(resID) + '/' +
                 context.getResources().getResourceTypeName(resID) + '/' +
@@ -80,8 +82,12 @@ public class SignUpFormActivity extends AppCompatActivity implements View.OnClic
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
+        Log.d(TAG, "onCreate: starts");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up_form);
+        makeFullScreen();
+        galleryImagePermissionRequest();
+
         mAuth = FirebaseAuth.getInstance();
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         mDatabaseRef = database.getReference(DB_CHILD);
@@ -111,13 +117,13 @@ public class SignUpFormActivity extends AppCompatActivity implements View.OnClic
 
     private void initializeWidgets()
     {
+        Log.d(TAG, "initializeWidgets: starts");
         mFname = (EditText) findViewById(R.id.actualFname);
         mLname = (EditText) findViewById(R.id.actuaLname);
         mEmail = (EditText) findViewById(R.id.actualEmail);
         mPassword = (EditText) findViewById(R.id.actualPW);
         mProfilePictureButton = (ImageButton) findViewById(R.id.proPicBut);
         mRegisterButton = (Button) findViewById(R.id.saveInfo);
-        mTempLogoutButton = (Button) findViewById(R.id.tempSignOutButton);
         mClearPhotoButton = (Button) findViewById(R.id.clearPhoto);
 
 
@@ -132,23 +138,65 @@ public class SignUpFormActivity extends AppCompatActivity implements View.OnClic
         /*Come back to this option, When doing the update option(When they edit their credentials)*/
         //  mImageUri = resourceToUri(getApplicationContext(), R.drawable.placeholder_person);
         mImageUri = null;
+        Log.d(TAG, "initializeWidgets: ends");
+    }
+
+    public void onClick(View v)
+    {
+        int id = v.getId();
+        switch (id)
+        {
+            case R.id.proPicBut:
+                Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT);
+                galleryIntent.setType("image/*");
+                startActivityForResult(galleryIntent, GALLERY_REQUEST_CODE);
+                break;
+            case R.id.saveInfo:
+                String fName = mFname.getText().toString().trim();
+                String lName = mLname.getText().toString().trim();
+                String email = mEmail.getText().toString().trim();
+                String password = mPassword.getText().toString().trim();
+                doRegistration(fName, lName, email, password, v);
+                break;
+            case R.id.clearPhoto:
+                mProfilePictureButton.setImageResource(placeholder_person);
+                // mImageUri = resourceToUri(getApplicationContext(), R.drawable.placeholder_person);
+                mImageUri = null;
+                break;
+        }
     }
 
     @Override
     protected void onStart()
     {
         super.onStart();
+        Log.d(TAG, "onStart: starts");
         mAuth.addAuthStateListener(mAuthStateListener);
+        Log.d(TAG, "onStart: ends");
     }
 
     @Override
     protected void onResume()
     {
         super.onResume();
+        Log.d(TAG, "onResume: starts");
+
+        someHouseKeepingPermissions();
+        photoButtonUI_Informaton();//With This Method, We can update the UI respectively,
+        // depending on whether the button is enabled or disabled
+
         mProfilePictureButton.setOnClickListener(this);
         mRegisterButton.setOnClickListener(this);
-        mTempLogoutButton.setOnClickListener(this);
         mClearPhotoButton.setOnClickListener(this);
+
+        Log.d(TAG, "onResume: ends");
+    }
+
+    @Override
+    protected void onPause()
+    {
+        super.onPause();
+        Log.d(TAG, "onPause: We are Paused");
     }
 
     @Override
@@ -161,34 +209,105 @@ public class SignUpFormActivity extends AppCompatActivity implements View.OnClic
         }
     }
 
-    public void onClick(View v)
+    private void galleryImagePermissionRequest()
     {
-        int id = v.getId();
-        switch (id)
+        if (ContextCompat.checkSelfPermission(this, PERMISSION_READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
         {
-            case R.id.proPicBut:
-                galleryImagePermissionRequest();
-                Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT);
-                galleryIntent.setType("image/*");
-                startActivityForResult(galleryIntent, GALLERY_REQUEST_CODE);
-                break;
-            case R.id.saveInfo:
-                String fName = mFname.getText().toString().trim();
-                String lName = mLname.getText().toString().trim();
-                String email = mEmail.getText().toString().trim();
-                String password = mPassword.getText().toString().trim();
-                doRegistration(fName, lName, email, password, v);
-                break;
-            case R.id.tempSignOutButton:
-                signOut();
-                break;
-            case R.id.clearPhoto:
-                mProfilePictureButton.setImageResource(placeholder_person);
-                // mImageUri = resourceToUri(getApplicationContext(), R.drawable.placeholder_person);
-                mImageUri = null;
-                break;
+            Log.d(TAG, "galleryImagePermissionRequest: Persmission not granted, Requesting");
+            requestGalleryPermission();
         }
     }
+
+    /*Reason Why This is in a method, I reused it at some point, so I left it in here, just in case i needed it again*/
+    private void requestGalleryPermission()
+    {
+        ActivityCompat.requestPermissions(this,
+                new String[]{PERMISSION_READ_EXTERNAL_STORAGE},
+                PERMISSION_REQUEST_IMAGE_GALLERY);
+    }
+
+    //http://stackoverflow.com/questions/11556607/android-difference-between-invisible-and-gone
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
+    {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode)
+        {
+            case PERMISSION_REQUEST_IMAGE_GALLERY:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                {
+                    Toast.makeText(getApplicationContext(), "Permission For" + permissions[0] + "Granted", Toast.LENGTH_LONG).show();
+                    mProfilePictureButton.setEnabled(true);
+                    //mProfilePictureButton.setVisibility(View.VISIBLE);
+                }
+                else if (grantResults[0] == PackageManager.PERMISSION_DENIED)
+                {
+                    mProfilePictureButton.setEnabled(false);
+                    //  mProfilePictureButton.setVisibility(View.INVISIBLE);
+                    new AlertDialog.Builder(this)
+                            .setIcon(R.drawable.ic_insert_photo_black_24dp)
+                            .setTitle("Gallery Access")
+                            .setMessage("Go to Settings > Apps > SportJunkie > Permissions > Enable Storage")
+                            .setNegativeButton("Dismiss", new DialogInterface.OnClickListener()
+                            {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which)
+                                {
+                                    dialog.dismiss();
+                                    Log.d(TAG, "onClick: Dialog Clicked");
+                                }
+                            })
+                            .setPositiveButton("Request Again", new DialogInterface.OnClickListener()
+                            {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which)
+                                {
+                                    Intent restart = getIntent();
+                                    finish();
+                                    startActivity(restart);
+                                    Log.d(TAG, "onClick: User Requests Permission Again");
+                                }
+                            }).show();
+                }
+                break;
+        }
+
+    }
+
+    /*This Method, It checks to see if the permissions are granted or not.
+    * If they Are Granted, The profile picture button will be enabled, and the user can select their photos
+    * If They Deny permission, The Button Will be disabled, and the user will not be able to select their photos
+    * This method is put in the onResume method, in the case of the user goung to settings and manually enabling the storage option,
+    * therefore, when they return from settings, the lifecycle returns to the onResume Method, and checks the permissions and updates
+    * the UI Accordingly.*/
+    private void someHouseKeepingPermissions()
+    {
+        if (ContextCompat.checkSelfPermission(this, PERMISSION_READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)
+        {
+            mProfilePictureButton.setEnabled(true);
+        }
+        else if (ContextCompat.checkSelfPermission(this, PERMISSION_READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
+        {
+            Toast.makeText(getApplicationContext(), "Cannot Access Photos, Needs Permission", Toast.LENGTH_SHORT).show();
+            mProfilePictureButton.setEnabled(false);
+        }
+    }
+
+    /*This Method, Checks To See If The Buttons Are Enabled Not
+    * Later On, We can Add more appropriate UI Changes so indicate That the button is not clickable or it is clickable*/
+    private void photoButtonUI_Informaton()
+    {
+        if (!mProfilePictureButton.isEnabled())
+        {
+            Toast.makeText(getApplicationContext(), "Cannot Select A Picture, Needs Permission", Toast.LENGTH_LONG).show();
+        }
+        else if (mProfilePictureButton.isEnabled())
+        {
+            Toast.makeText(getApplicationContext(), "You Can Select A Profile Picture", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    //TODO:When user is registering, check if their email is arleady in the database,that means, that their account was already created
 
     /*I Should Refactor This Code Some more, Cause why the fuck not*/
     private void doRegistration(final String fName, final String lName, final String email, final String password, View v)
@@ -294,8 +413,6 @@ public class SignUpFormActivity extends AppCompatActivity implements View.OnClic
         }
     }
 
-    //TODO:When user is registering, check if their email is arleady in the database,that means, that their account was already created
-
     private boolean isValid(String fName, String lName, String email, String password)
     {
         final int fName_lName_limit = 3;
@@ -345,37 +462,6 @@ public class SignUpFormActivity extends AppCompatActivity implements View.OnClic
         return valid;
     }
 
-    private void galleryImagePermissionRequest()
-    {
-        String permission = Manifest.permission.READ_EXTERNAL_STORAGE;
-        if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED)
-        {
-           /* if (ActivityCompat.shouldShowRequestPermissionRationale(this, permission))
-            {
-                ActivityCompat.requestPermissions(this, new String[]{permission}, PERMISSION_REQUEST_IMAGE_GALLERY);
-            }*/
-            ActivityCompat.requestPermissions(this,
-                    new String[]{permission},
-                    PERMISSION_REQUEST_IMAGE_GALLERY);
-
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
-    {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode)
-        {
-            case PERMISSION_REQUEST_IMAGE_GALLERY:
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
-                {
-                    Toast.makeText(getApplicationContext(), "Permission For" + permissions[0] + "Granted", Toast.LENGTH_LONG).show();
-                }
-                break;
-        }
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {
@@ -398,6 +484,25 @@ public class SignUpFormActivity extends AppCompatActivity implements View.OnClic
 
     private void signOut()
     {
+        Log.d(TAG, "signOut: called");
         mAuth.signOut();
+    }
+
+    private void makeFullScreen()
+    {
+        final View decorView = getWindow().getDecorView();
+        final int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
+        decorView.setSystemUiVisibility(uiOptions);
+        decorView.setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener()
+        {
+            @Override
+            public void onSystemUiVisibilityChange(int visibility)
+            {
+                if ((visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) == 0)
+                {
+                    decorView.setSystemUiVisibility(uiOptions);
+                }
+            }
+        });
     }
 }

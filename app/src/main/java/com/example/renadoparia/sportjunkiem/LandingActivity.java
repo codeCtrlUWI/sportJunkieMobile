@@ -100,7 +100,6 @@ public class LandingActivity extends AppCompatActivity implements
         findViewById(R.id.email_signin_button).setOnClickListener(this);
         findViewById(R.id.google_signin_button).setOnClickListener(this);
         findViewById(R.id.hasNoAcc).setOnClickListener(this);
-        // findViewById(R.id.tempsineout).setOnClickListener(this);
     }
 
     @Override
