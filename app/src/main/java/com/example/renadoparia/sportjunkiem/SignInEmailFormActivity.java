@@ -46,7 +46,7 @@ public class SignInEmailFormActivity extends AppCompatActivity implements View.O
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null)
                 {
-                    //TODO:Add Redirection
+
                     Log.d(TAG, "onAuthStateChanged: User is Signed In: " + user.getEmail());
                 }
                 else

@@ -65,6 +65,9 @@ public class LandingActivity extends AppCompatActivity implements
                 if (user != null)
                 {
                     //TODO:Add Redirection
+                    Intent tempIntent = new Intent(getApplicationContext(), SignUpFormActivity.class);
+                    startActivity(tempIntent);
+
                     Toast.makeText(getApplicationContext(), "Name: " + user.getDisplayName(), Toast.LENGTH_LONG).show();
                     Log.d(TAG, "onAuthStateChanged: User is Signed In: " + user.getEmail());
                 }
@@ -201,6 +204,7 @@ public class LandingActivity extends AppCompatActivity implements
                         }
                         else
                         {
+                            Log.d(TAG, "onComplete: " + task.getException());
                             Log.d(TAG, "onComplete: signed in not complete");
                         }
                     }
