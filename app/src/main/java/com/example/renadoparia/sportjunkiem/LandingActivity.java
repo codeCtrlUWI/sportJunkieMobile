@@ -78,6 +78,7 @@ public class LandingActivity extends AppCompatActivity implements
 
                     Toast.makeText(getApplicationContext(), "Name: " + user.getDisplayName(), Toast.LENGTH_LONG).show();
                     Log.d(TAG, "onAuthStateChanged: User is Signed In: " + user.getEmail());
+                    Log.d(TAG, "onAuthStateChanged: Name " + user.getDisplayName());
                 }
                 else
                 {
@@ -185,6 +186,10 @@ public class LandingActivity extends AppCompatActivity implements
             {
                 GoogleSignInAccount googleSignInAccount = googleSignInResult.getSignInAccount();
                 Log.d(TAG, "onActivityResult:Full name " + googleSignInAccount.getDisplayName());
+                Log.d(TAG, "onActivityResult: First Name: " + googleSignInAccount.getGivenName());
+                Log.d(TAG, "onActivityResult: Last name: " + googleSignInAccount.getFamilyName());
+                Log.d(TAG, "onActivityResult: Email: " + googleSignInAccount.getEmail());
+                Log.d(TAG, "onActivityResult: Id" + googleSignInAccount.getId());
                 fireBaseAuthWithGoogle(googleSignInAccount);
             }
         }
@@ -213,16 +218,16 @@ public class LandingActivity extends AppCompatActivity implements
                     {
                         String googleFirstName = googleSignInAccount.getGivenName();
                         String googleLastName = googleSignInAccount.getFamilyName();
+                        Log.d(TAG, "onComplete: googleFirstName: " + googleFirstName);
+                        Log.d(TAG, "onComplete: googleLastName: " + googleLastName);
                         if (task.isSuccessful())
                         {
-
                             User googleUser = new User(googleFirstName, googleLastName,
                                     task.getResult().getUser().getEmail(),
                                     task.getResult().getUser().getUid(),
                                     task.getResult().getUser().getPhotoUrl().toString());
 
                             mDatabaseReference.child(googleSignInAccount.getId()).setValue(googleUser);
-
                             Log.d(TAG, "onComplete: signed in complete ");
                             Log.d(TAG, "onComplete: Name: " + task.getResult().getUser().getDisplayName());
                             Log.d(TAG, "onComplete: Email:" + task.getResult().getUser().getEmail());
