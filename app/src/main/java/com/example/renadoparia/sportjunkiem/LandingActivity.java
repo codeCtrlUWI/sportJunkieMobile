@@ -23,6 +23,8 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class LandingActivity extends AppCompatActivity implements
         View.OnClickListener,
@@ -30,9 +32,11 @@ public class LandingActivity extends AppCompatActivity implements
 {
     private static final String TAG = "LandingActivity";
     private static final int RC_SIGN_IN = 1738;
+    private static final String DB_CHILD = "USERS";
 
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
+    private DatabaseReference mDatabaseReference;
     private GoogleApiClient mGoogleApiClient;
 
     @Override
@@ -45,6 +49,10 @@ public class LandingActivity extends AppCompatActivity implements
         initializeWidgets();
         makeFullScreen();
 
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        mDatabaseReference = database.getReference().child(DB_CHILD);
+
+        //Google Auth Stuffs
         GoogleSignInOptions googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
@@ -65,7 +73,7 @@ public class LandingActivity extends AppCompatActivity implements
                 if (user != null)
                 {
                     //TODO:Add Redirection
-                    Intent tempIntent = new Intent(getApplicationContext(), SignUpFormActivity.class);
+                    Intent tempIntent = new Intent(getApplicationContext(), HomeActivity.class);
                     startActivity(tempIntent);
 
                     Toast.makeText(getApplicationContext(), "Name: " + user.getDisplayName(), Toast.LENGTH_LONG).show();
@@ -176,6 +184,7 @@ public class LandingActivity extends AppCompatActivity implements
             if (googleSignInResult.isSuccess())
             {
                 GoogleSignInAccount googleSignInAccount = googleSignInResult.getSignInAccount();
+                Log.d(TAG, "onActivityResult:Full name " + googleSignInAccount.getDisplayName());
                 fireBaseAuthWithGoogle(googleSignInAccount);
             }
         }
@@ -185,9 +194,16 @@ public class LandingActivity extends AppCompatActivity implements
         }
     }
 
-    private void fireBaseAuthWithGoogle(GoogleSignInAccount googleSignInAccount)
+    /*Note: A Google account's email address can change, so don't use it to identify a user.
+     Instead, use the account's ID, which you can get on the client with GoogleSignInAccount.getId,
+     and on the backend from the sub claim of the ID token.*/
+
+    /*https://developers.google.com/identity/sign-in/android/people*/
+
+    private void fireBaseAuthWithGoogle(final GoogleSignInAccount googleSignInAccount)
     {
         Log.d(TAG, "fireBaseAuthWithGoogle: " + googleSignInAccount.getId());
+        Log.d(TAG, "fireBaseAuthWithGoogle: " + googleSignInAccount.getIdToken());
         AuthCredential credential = GoogleAuthProvider.getCredential(googleSignInAccount.getIdToken(), null);
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>()
@@ -195,8 +211,18 @@ public class LandingActivity extends AppCompatActivity implements
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task)
                     {
+                        String googleFirstName = googleSignInAccount.getGivenName();
+                        String googleLastName = googleSignInAccount.getFamilyName();
                         if (task.isSuccessful())
                         {
+
+                            User googleUser = new User(googleFirstName, googleLastName,
+                                    task.getResult().getUser().getEmail(),
+                                    task.getResult().getUser().getUid(),
+                                    task.getResult().getUser().getPhotoUrl().toString());
+
+                            mDatabaseReference.child(googleSignInAccount.getId()).setValue(googleUser);
+
                             Log.d(TAG, "onComplete: signed in complete ");
                             Log.d(TAG, "onComplete: Name: " + task.getResult().getUser().getDisplayName());
                             Log.d(TAG, "onComplete: Email:" + task.getResult().getUser().getEmail());

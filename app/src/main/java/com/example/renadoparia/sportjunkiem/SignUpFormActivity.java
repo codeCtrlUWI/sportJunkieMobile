@@ -23,12 +23,6 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
-import com.google.android.gms.auth.api.Auth;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -46,8 +40,7 @@ import java.util.UUID;
 
 import static com.example.renadoparia.sportjunkiem.R.drawable.placeholder_person;
 
-public class SignUpFormActivity extends AppCompatActivity implements View.OnClickListener,
-        GoogleApiClient.OnConnectionFailedListener
+public class SignUpFormActivity extends AppCompatActivity implements View.OnClickListener
 {
     private static final String TAG = "SignUpFormActivity";
     private static final String DB_CHILD = "USERS";
@@ -71,7 +64,6 @@ public class SignUpFormActivity extends AppCompatActivity implements View.OnClic
     private DatabaseReference mDatabaseRef;
     private StorageReference mStorageRef;
 
-    private GoogleApiClient mGoogleApiClient;
 
     //TODO: Add Confirmation Password Field, Then Check To See if It's Valid against Initial Password Entered
     //TODO: Consider Offline Storage
@@ -98,22 +90,12 @@ public class SignUpFormActivity extends AppCompatActivity implements View.OnClic
         galleryImagePermissionRequest();
 
         mAuth = FirebaseAuth.getInstance();
+
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         mDatabaseRef = database.getReference(DB_CHILD);
         mStorageRef = FirebaseStorage.getInstance().getReference().child(NAME_OF_FOLDER_FOR_PROFILEPIC);
 
-        /*The Reason the Google Code was added was for the sign out function, in the case where the sign out button is clicked,
-        * my intention was to have the user to actually sign out of the google out and just the firebase instance,
-        * so therefore, when they do click sign in with Google, it brings back up the options to select whereas, if i didn't do it,
-        * and they tapped the google sign in button, it would just sign them back in without prompt*/
-        GoogleSignInOptions googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.default_web_client_id))
-                .requestEmail()
-                .build();
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this, this)
-                .addApi(Auth.GOOGLE_SIGN_IN_API, googleSignInOptions)
-                .build();
+
 
         mAuthStateListener = new FirebaseAuth.AuthStateListener()
         {
@@ -123,13 +105,12 @@ public class SignUpFormActivity extends AppCompatActivity implements View.OnClic
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null)
                 {
-                    //TODO:Add Redirection
+                    Intent tempIntent = new Intent(getApplicationContext(), HomeActivity.class);
+                    startActivity(tempIntent);
                     Log.d(TAG, "onAuthStateChanged: User is Signed In: " + user.getEmail());
                 }
                 else
                 {
-                    Intent intent = new Intent(getApplicationContext(), LandingActivity.class);
-                    startActivity(intent);
                     Log.d(TAG, "onAuthStateChanged: User Is Not Signed In");
                 }
             }
@@ -138,29 +119,6 @@ public class SignUpFormActivity extends AppCompatActivity implements View.OnClic
         initializeWidgets();//Initializes All The Necessary Widgets For This Activity
     }
 
-    private void signOut()
-    {
-        Log.d(TAG, "signOut: called");
-        mAuth.signOut();
-
-
-        Auth.GoogleSignInApi.signOut(mGoogleApiClient)
-                .setResultCallback(new ResultCallback<Status>()
-                {
-                    @Override
-                    public void onResult(@NonNull Status status)
-                    {
-                        Log.d(TAG, "onResult: " + status.getStatus().toString());
-                    }
-                });
-    }
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult)
-    {
-        Log.d(TAG, "onConnectionFailed: " + connectionResult.toString());
-        Toast.makeText(getApplicationContext(), "Google Error", Toast.LENGTH_LONG).show();
-    }
 
     private void initializeWidgets()
     {
@@ -174,7 +132,7 @@ public class SignUpFormActivity extends AppCompatActivity implements View.OnClic
         mClearPhotoButton = (Button) findViewById(R.id.clearPhoto);
 
         //Temp button For Google SignOut Testing Below
-        findViewById(R.id.tempSine).setOnClickListener(this);
+        // findViewById(R.id.tempSine).setOnClickListener(this);
 
         /*Setting Default URI To PlaceHolder Image, So If the user does not select an image to post,
         * their default will be a placeholder image*/
@@ -211,9 +169,6 @@ public class SignUpFormActivity extends AppCompatActivity implements View.OnClic
                 mProfilePictureButton.setImageResource(placeholder_person);
                 // mImageUri = resourceToUri(getApplicationContext(), R.drawable.placeholder_person);
                 mImageUri = null;
-                break;
-            case R.id.tempSine:
-                signOut();
                 break;
         }
     }
@@ -306,7 +261,7 @@ public class SignUpFormActivity extends AppCompatActivity implements View.OnClic
                                 public void onClick(DialogInterface dialog, int which)
                                 {
                                     dialog.dismiss();
-                                    Log.d(TAG, "onClick: Dialog Clicked");
+                                    Log.d(TAG, "onClick: Dismiss Tapped");
                                 }
                             })
                             .setPositiveButton("Request Again", new DialogInterface.OnClickListener()
@@ -477,7 +432,7 @@ public class SignUpFormActivity extends AppCompatActivity implements View.OnClic
             mFname.setError(getString(R.string.name_entry_limit));
             valid = false;
         }
-        else if (!TextUtils.isEmpty(fName) || fName.length() >= fName_lName_limit)
+        else if (fName.length() >= fName_lName_limit)
         {
             mFname.setError(null);
         }
@@ -487,7 +442,7 @@ public class SignUpFormActivity extends AppCompatActivity implements View.OnClic
             mLname.setError(getString(R.string.name_entry_limit));
             valid = false;
         }
-        else if (!TextUtils.isEmpty(fName) || fName.length() >= fName_lName_limit)
+        else if (fName.length() >= fName_lName_limit)
         {
             mFname.setError(null);
         }
@@ -554,6 +509,4 @@ public class SignUpFormActivity extends AppCompatActivity implements View.OnClic
             }
         });
     }
-
-
 }

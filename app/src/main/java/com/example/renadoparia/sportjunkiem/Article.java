@@ -19,6 +19,8 @@ class Article
     private String mUrlToImage;
     private int mNumberOfClicks;
 
+    //private String mLinkToArticle;
+    /*This may be added, for sharing purposes later on, if it is added, remember to remake constructors accordingly*/
 
     public Article(String articleID, String authorUID, String authorFname, String authorLname, String title, String subtitle, String articleData, String category, String timeAndDateCreated, String lastUpdated, String urlToImage, int numberOfClicks)
     {
