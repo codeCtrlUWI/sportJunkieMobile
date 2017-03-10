@@ -1,27 +1,79 @@
 package com.example.renadoparia.sportjunkiem;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
+import android.support.design.widget.TabLayout;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 public class HomeActivity extends AppCompatActivity
-        implements View.OnClickListener
+        implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.OnConnectionFailedListener
 {
     private static final String TAG = "HomeActivity";
 
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
+    private GoogleApiClient mGoogleApiClient;
+
+    private DrawerLayout mDrawerLayout;
+    private NavigationView mNavigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        initGoogleStuff();
+
+        //Tabs Just To Test
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+        tabLayout.addTab(tabLayout.newTab().setText("Featured"));
+        tabLayout.addTab(tabLayout.newTab().setText("Trending"));
+        tabLayout.addTab(tabLayout.newTab().setText("Video?"));
+
+        mNavigationView = (NavigationView) findViewById(R.id.drawer_nav_view);
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+
+        ActionBar supportActionBar = getSupportActionBar();
+        if (supportActionBar != null)
+        {
+            supportActionBar.setHomeAsUpIndicator(R.drawable.ic_menu_white_24dp);
+            supportActionBar.setDisplayHomeAsUpEnabled(true);
+        }
+
+        ActionBarDrawerToggle drawerToggle = new ActionBarDrawerToggle
+                (this,
+                        mDrawerLayout,
+                        toolbar,
+                        R.string.open,
+                        R.string.close);
+
+        mDrawerLayout.addDrawerListener(drawerToggle);
+        drawerToggle.syncState();
+        mNavigationView.setNavigationItemSelectedListener(this);
+
         mAuth = FirebaseAuth.getInstance();
         mAuthStateListener = new FirebaseAuth.AuthStateListener()
         {
@@ -35,12 +87,64 @@ public class HomeActivity extends AppCompatActivity
                 }
                 else
                 {
+                    Intent intent = new Intent(getApplicationContext(), LandingActivity.class);
+                    startActivity(intent);
                     Log.d(TAG, "onAuthStateChanged: User Is Not Signed In");
                 }
             }
         };
     }
 
+    private void initGoogleStuff()
+    {
+        GoogleSignInOptions googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build();
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(this, this)
+                .addApi(Auth.GOOGLE_SIGN_IN_API, googleSignInOptions)
+                .build();
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item)
+    {
+        int id = item.getItemId();
+
+        if (id == R.id.foosball)
+        {
+            Log.d(TAG, "onNavigationItemSelected: FoosBall Tapped: " + id);
+        }
+        if (id == R.id.loggo)
+        {
+            signOut();
+        }
+        mDrawerLayout.closeDrawer(GravityCompat.START);
+        return true;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+        if (id == android.R.id.home)
+        {
+            mDrawerLayout.openDrawer(GravityCompat.START);
+        }
+        return super.onOptionsItemSelected(item);
+
+    }
 
     @Override
     protected void onStart()
@@ -69,5 +173,29 @@ public class HomeActivity extends AppCompatActivity
         {
 
         }
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult)
+    {
+
+    }
+
+
+    private void signOut()
+    {
+        Log.d(TAG, "signOut: called");
+        mAuth.signOut();
+
+
+        Auth.GoogleSignInApi.signOut(mGoogleApiClient)
+                .setResultCallback(new ResultCallback<Status>()
+                {
+                    @Override
+                    public void onResult(@NonNull Status status)
+                    {
+                        Log.d(TAG, "onResult: " + status.getStatus().toString());
+                    }
+                });
     }
 }

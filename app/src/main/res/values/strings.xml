@@ -20,4 +20,6 @@
     <string name="read_more">Read More</string>
     <string name="image_for_article">Image For Article</string>
     <string name="share_button">Share Button</string>
+    <string name="open">Open Navigation Drawer</string>
+    <string name="close">Close Navigation Drawer</string>
 </resources>
