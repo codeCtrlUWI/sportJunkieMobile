@@ -11,6 +11,7 @@ class User
     private String mEmail;
     private String mUID;
     private String mProfilePicURL;
+    private Boolean isAdmin;
 
     public User(String firstName, String lastName, String email, String UID, String profilePicURL)
     {
@@ -19,6 +20,17 @@ class User
         mEmail = email;
         mUID = UID;
         mProfilePicURL = profilePicURL;
+        isAdmin = false;
+    }
+
+    public Boolean getAdmin()
+    {
+        return isAdmin;
+    }
+
+    public void setAdmin(Boolean admin)
+    {
+        isAdmin = admin;
     }
 
     public User()

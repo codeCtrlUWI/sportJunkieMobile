@@ -1,5 +1,7 @@
 package com.example.renadoparia.sportjunkiem;
 
+import java.util.List;
+
 /**
  * Created by Renado_Paria on 3/6/2017 at 9:11 PM.
  */
@@ -18,11 +20,11 @@ class Article
     private String mLastUpdated;
     private String mUrlToImage;
     private int mNumberOfClicks;
+    private List<String> mGalleryImages;
 
     //private String mLinkToArticle;
     /*This may be added, for sharing purposes later on, if it is added, remember to remake constructors accordingly*/
-
-    public Article(String articleID, String authorUID, String authorFname, String authorLname, String title, String subtitle, String articleData, String category, String timeAndDateCreated, String lastUpdated, String urlToImage, int numberOfClicks)
+    public Article(String articleID, String authorUID, String authorFname, String authorLname, String title, String subtitle, String articleData, String category, String timeAndDateCreated, String lastUpdated, String urlToImage, int numberOfClicks, List<String> galleryImages)
     {
         mArticleID = articleID;
         mAuthorUID = authorUID;
@@ -36,9 +38,10 @@ class Article
         mLastUpdated = lastUpdated;
         mUrlToImage = urlToImage;
         mNumberOfClicks = numberOfClicks;
+        mGalleryImages = galleryImages;
     }
 
-    public Article(String articleID, String authorUID, String authorFname, String authorLname, String title, String subtitle, String articleData, String category, String timeAndDateCreated, String lastUpdated, String urlToImage)
+    public Article(String articleID, String authorUID, String authorFname, String authorLname, String title, String subtitle, String articleData, String category, String timeAndDateCreated, String lastUpdated, String urlToImage, List<String> galleryImages)
     {
         mArticleID = articleID;
         mAuthorUID = authorUID;
@@ -52,6 +55,7 @@ class Article
         mLastUpdated = lastUpdated;
         mUrlToImage = urlToImage;
         mNumberOfClicks = 0;
+        mGalleryImages = galleryImages;
     }
 
     public String getArticleID()
@@ -172,6 +176,16 @@ class Article
     public void setNumberOfClicks(int numberOfClicks)
     {
         mNumberOfClicks = numberOfClicks;
+    }
+
+    public List<String> getGalleryImages()
+    {
+        return mGalleryImages;
+    }
+
+    public void setGalleryImages(List<String> galleryImages)
+    {
+        mGalleryImages = galleryImages;
     }
 }
 
