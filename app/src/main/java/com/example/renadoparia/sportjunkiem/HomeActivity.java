@@ -112,13 +112,14 @@ public class HomeActivity extends AppCompatActivity
     {
         int id = item.getItemId();
 
-        if (id == R.id.foosball)
+        switch (id)
         {
-            Log.d(TAG, "onNavigationItemSelected: FoosBall Tapped: " + id);
-        }
-        if (id == R.id.loggo)
-        {
-            signOut();
+            case R.id.foosball:
+                Log.d(TAG, "onNavigationItemSelected: FoosBall Tapped: " + id);
+                break;
+            case R.id.loggo:
+                signOut();
+                break;
         }
         mDrawerLayout.closeDrawer(GravityCompat.START);
         return true;
