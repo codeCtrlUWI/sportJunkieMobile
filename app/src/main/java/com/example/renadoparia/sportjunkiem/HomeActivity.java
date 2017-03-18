@@ -5,7 +5,11 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -24,6 +28,9 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class HomeActivity extends AppCompatActivity
         implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.OnConnectionFailedListener
@@ -47,11 +54,11 @@ public class HomeActivity extends AppCompatActivity
 
         initGoogleStuff();
 
+        ViewPager viewPager = (ViewPager) findViewById(R.id.viewPager);
+        setUpViewPager(viewPager);
         //Tabs Just To Test
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
-        tabLayout.addTab(tabLayout.newTab().setText("Featured"));
-        tabLayout.addTab(tabLayout.newTab().setText("Trending"));
-        tabLayout.addTab(tabLayout.newTab().setText("Video?"));
+        tabLayout.setupWithViewPager(viewPager);
 
         mNavigationView = (NavigationView) findViewById(R.id.drawer_nav_view);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -198,5 +205,48 @@ public class HomeActivity extends AppCompatActivity
                         Log.d(TAG, "onResult: " + status.getStatus().toString());
                     }
                 });
+    }
+
+    //http://stackoverflow.com/questions/18747975/difference-between-fragmentpageradapter-and-fragmentstatepageradapter
+    private static class Adapter extends FragmentStatePagerAdapter
+    {
+        private final List<Fragment> mFragmentList = new ArrayList<>();
+        private final List<String> mFragmentTitleList = new ArrayList<>();
+
+        Adapter(FragmentManager fm)
+        {
+            super(fm);
+        }
+
+        @Override
+        public Fragment getItem(int position)
+        {
+            return mFragmentList.get(position);
+        }
+
+        @Override
+        public int getCount()
+        {
+            return mFragmentList.size();
+        }
+
+        void addFragment(Fragment fragment, String title)
+        {
+            mFragmentList.add(fragment);
+            mFragmentTitleList.add(title);
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position)
+        {
+            return mFragmentTitleList.get(position);
+        }
+    }
+
+    private void setUpViewPager(ViewPager viewPager)
+    {
+        Adapter adapter = new Adapter(getSupportFragmentManager());
+        adapter.addFragment(new FeaturedFragment(), "Featured");
+        viewPager.setAdapter(adapter);
     }
 }

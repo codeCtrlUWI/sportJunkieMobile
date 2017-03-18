@@ -16,15 +16,19 @@ class Article
     private String mSubtitle;
     private String mArticleData;
     private String mCategory;
-    private String mTimeAndDateCreated;
+    private long mTimeAndDateCreated;
     private String mLastUpdated;
     private String mUrlToImage;
     private int mNumberOfClicks;
     private List<String> mGalleryImages;
 
+    public Article()
+    {
+    }
+
     //private String mLinkToArticle;
     /*This may be added, for sharing purposes later on, if it is added, remember to remake constructors accordingly*/
-    public Article(String articleID, String authorUID, String authorFname, String authorLname, String title, String subtitle, String articleData, String category, String timeAndDateCreated, String lastUpdated, String urlToImage, int numberOfClicks, List<String> galleryImages)
+    public Article(String articleID, String authorUID, String authorFname, String authorLname, String title, String subtitle, String articleData, String category, long timeAndDateCreated, String lastUpdated, String urlToImage, int numberOfClicks, List<String> galleryImages)
     {
         mArticleID = articleID;
         mAuthorUID = authorUID;
@@ -41,7 +45,7 @@ class Article
         mGalleryImages = galleryImages;
     }
 
-    public Article(String articleID, String authorUID, String authorFname, String authorLname, String title, String subtitle, String articleData, String category, String timeAndDateCreated, String lastUpdated, String urlToImage, List<String> galleryImages)
+    public Article(String articleID, String authorUID, String authorFname, String authorLname, String title, String subtitle, String articleData, String category, long timeAndDateCreated, String lastUpdated, String urlToImage, List<String> galleryImages)
     {
         mArticleID = articleID;
         mAuthorUID = authorUID;
@@ -138,12 +142,12 @@ class Article
         mCategory = category;
     }
 
-    public String getTimeAndDateCreated()
+    public long getTimeAndDateCreated()
     {
         return mTimeAndDateCreated;
     }
 
-    public void setTimeAndDateCreated(String timeAndDateCreated)
+    public void setTimeAndDateCreated(long timeAndDateCreated)
     {
         mTimeAndDateCreated = timeAndDateCreated;
     }
@@ -186,6 +190,25 @@ class Article
     public void setGalleryImages(List<String> galleryImages)
     {
         mGalleryImages = galleryImages;
+    }
+
+    @Override
+    public String toString()
+    {
+        return "{" +
+                "mArticleID='" + mArticleID + '\'' +
+                ", mAuthorUID='" + mAuthorUID + '\'' +
+                ", mAuthorFname='" + mAuthorFname + '\'' +
+                ", mAuthorLname='" + mAuthorLname + '\'' +
+                ", mTitle='" + mTitle + '\'' +
+                ", mSubtitle='" + mSubtitle + '\'' +
+                ", mArticleData='" + mArticleData + '\'' +
+                ", mCategory='" + mCategory + '\'' +
+                ", mTimeAndDateCreated=" + mTimeAndDateCreated +
+                ", mLastUpdated='" + mLastUpdated + '\'' +
+                ", mUrlToImage='" + mUrlToImage + '\'' +
+                ", mNumberOfClicks=" + mNumberOfClicks +
+                ", mGalleryImages=" + mGalleryImages + '}';
     }
 }
 
