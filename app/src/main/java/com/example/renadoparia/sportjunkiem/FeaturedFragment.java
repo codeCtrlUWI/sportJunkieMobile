@@ -30,6 +30,7 @@ public class FeaturedFragment extends Fragment
     private static final String mArticleRef = "ARTICLES";
     private DatabaseReference mDatabaseReference;
     private static FirebaseRecyclerAdapter<Article, ArticleViewHolder> mFireBaseRecyclerAdapter;
+    private String mCategory;
 
     public FeaturedFragment()
     {
@@ -40,7 +41,8 @@ public class FeaturedFragment extends Fragment
     {
         super.onCreate(savedInstanceState);
         mDatabaseReference = FirebaseDatabase.getInstance().getReference().child(mArticleRef);
-
+        mCategory = getArguments().getString("Tag");
+        Log.d(TAG, "onCreate: tag: " + mCategory);
     }
 
     @Nullable
@@ -48,7 +50,7 @@ public class FeaturedFragment extends Fragment
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
     {
         Log.d(TAG, "onCreateView: starts");
-        Query queryArticles = mDatabaseReference.orderByChild("authorFname");
+        Query queryArticles = mDatabaseReference.orderByChild("category").equalTo(mCategory);
         Log.d(TAG, "onCreateView: we past the snapshot");
         RecyclerView recyclerView = (RecyclerView) inflater.inflate(R.layout.recycler_view, container, false);
         recyclerView.setHasFixedSize(true);

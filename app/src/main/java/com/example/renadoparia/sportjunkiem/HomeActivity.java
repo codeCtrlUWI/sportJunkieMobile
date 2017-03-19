@@ -36,6 +36,8 @@ public class HomeActivity extends AppCompatActivity
         implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.OnConnectionFailedListener
 {
     private static final String TAG = "HomeActivity";
+    private static final String FOOTBALL_TAG = "Football";
+    private static final String CRICKET_TAG = "Cricket";
 
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
@@ -55,7 +57,16 @@ public class HomeActivity extends AppCompatActivity
         initGoogleStuff();
 
         ViewPager viewPager = (ViewPager) findViewById(R.id.viewPager);
-        setUpViewPager(viewPager);
+
+        /*JUST TO TEST, FIX AFTER*/ //CHECK FOR SAVED STATES AFTER, IF NOT NULL, RELOAD WHERE THEY LAST WAS, ELSE, JUST YOLOLOLOL
+
+        Fragment fragment = new FeaturedFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString("Tag", "Home");
+        fragment.setArguments(bundle);
+        setUpViewPager(viewPager, fragment);
+
+        /*------------------------------------------*/
         //Tabs Just To Test
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
@@ -118,11 +129,23 @@ public class HomeActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(@NonNull MenuItem item)
     {
         int id = item.getItemId();
-
+        final String KEY = "Tag";
+        final ViewPager viewPager = (ViewPager) findViewById(R.id.viewPager);
+        Fragment categoryFragment;
+        Bundle bundle = new Bundle();
         switch (id)
         {
             case R.id.foosball:
-                Log.d(TAG, "onNavigationItemSelected: FoosBall Tapped: " + id);
+                categoryFragment = new FeaturedFragment();
+                bundle.putString(KEY, FOOTBALL_TAG);
+                categoryFragment.setArguments(bundle);
+                setUpViewPager(viewPager, categoryFragment);
+                break;
+            case R.id.cricket:
+                categoryFragment = new FeaturedFragment();
+                bundle.putString(KEY, CRICKET_TAG);
+                categoryFragment.setArguments(bundle);
+                setUpViewPager(viewPager, categoryFragment);
                 break;
             case R.id.loggo:
                 signOut();
@@ -247,6 +270,13 @@ public class HomeActivity extends AppCompatActivity
     {
         Adapter adapter = new Adapter(getSupportFragmentManager());
         adapter.addFragment(new FeaturedFragment(), "Featured");
+        viewPager.setAdapter(adapter);
+    }
+
+    private void setUpViewPager(ViewPager viewPager, Fragment fragment)
+    {
+        Adapter adapter = new Adapter(getSupportFragmentManager());
+        adapter.addFragment(fragment, "Featured");
         viewPager.setAdapter(adapter);
     }
 }
