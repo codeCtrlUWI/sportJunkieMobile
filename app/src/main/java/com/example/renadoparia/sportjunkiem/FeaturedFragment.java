@@ -28,9 +28,12 @@ public class FeaturedFragment extends Fragment
     private static final String TAG = "FeaturedFragment";
 
     private static final String mArticleRef = "ARTICLES";
+    private static final String QUERY_ALL_ARTICLES = "author";//Used author, but i think you could use any field
+    private static final String QUERY_BY_CATEGORY = "category";
     private DatabaseReference mDatabaseReference;
     private static FirebaseRecyclerAdapter<Article, ArticleViewHolder> mFireBaseRecyclerAdapter;
     private String mCategory;
+    private String mTitle;
 
     public FeaturedFragment()
     {
@@ -53,14 +56,14 @@ public class FeaturedFragment extends Fragment
         Query queryArticles;
         if (mCategory.equalsIgnoreCase(HomeActivity.NO_MENU_ITEM_SELECTED))
         {
-            queryArticles = mDatabaseReference.orderByChild("author");
+            queryArticles = mDatabaseReference.orderByChild(QUERY_ALL_ARTICLES);
+            mTitle = getString(R.string.home);
         }
         else
         {
-            queryArticles = mDatabaseReference.orderByChild("category").equalTo(mCategory);
+            queryArticles = mDatabaseReference.orderByChild(QUERY_BY_CATEGORY).equalTo(mCategory);
+            mTitle = mCategory;
         }
-
-        Log.d(TAG, "onCreateView: we past the snapshot");
         RecyclerView recyclerView = (RecyclerView) inflater.inflate(R.layout.recycler_view, container, false);
         recyclerView.setHasFixedSize(true);
         mFireBaseRecyclerAdapter = new FirebaseRecyclerAdapter<Article, ArticleViewHolder>(
@@ -91,16 +94,8 @@ public class FeaturedFragment extends Fragment
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
-        String title;
-        if (mCategory.equalsIgnoreCase(HomeActivity.NO_MENU_ITEM_SELECTED))
-        {
-            title = getString(R.string.home);
-        }
-        else
-        {
-            title = mCategory;
-        }
-        getActivity().setTitle(title);
+
+        getActivity().setTitle(mTitle);
     }
 
     private static class ArticleViewHolder extends RecyclerView.ViewHolder
