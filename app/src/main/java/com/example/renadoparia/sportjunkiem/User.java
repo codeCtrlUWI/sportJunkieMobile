@@ -11,7 +11,7 @@ class User
     private String mEmail;
     private String mUID;
     private String mProfilePicURL;
-    private Boolean isAdmin;
+    private Boolean isAuthor;
 
     public User(String firstName, String lastName, String email, String UID, String profilePicURL)
     {
@@ -20,17 +20,17 @@ class User
         mEmail = email;
         mUID = UID;
         mProfilePicURL = profilePicURL;
-        isAdmin = false;
+        isAuthor = false;
     }
 
-    public Boolean getAdmin()
+    public Boolean getAuthor()
     {
-        return isAdmin;
+        return isAuthor;
     }
 
-    public void setAdmin(Boolean admin)
+    public void setAuthor(Boolean author)
     {
-        isAdmin = admin;
+        isAuthor = author;
     }
 
     public User()

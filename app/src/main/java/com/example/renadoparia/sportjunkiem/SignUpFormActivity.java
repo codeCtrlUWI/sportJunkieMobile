@@ -96,7 +96,6 @@ public class SignUpFormActivity extends AppCompatActivity implements View.OnClic
         mStorageRef = FirebaseStorage.getInstance().getReference().child(NAME_OF_FOLDER_FOR_PROFILEPIC);
 
 
-
         mAuthStateListener = new FirebaseAuth.AuthStateListener()
         {
             @Override
@@ -348,7 +347,7 @@ public class SignUpFormActivity extends AppCompatActivity implements View.OnClic
                                         {
                                             Uri profilePicUri = taskSnapshot.getDownloadUrl();
                                             User user = new User(fName, lName, email, userUID, profilePicUri.toString());
-                                            mDatabaseRef.push().setValue(user);
+                                            mDatabaseRef.child(userUID).setValue(user);
                                             Snackbar.make(view, "Welcome: " + fName + " " + lName, Snackbar.LENGTH_LONG).show();
                                         }
                                     }).addOnFailureListener(new OnFailureListener()
@@ -370,7 +369,7 @@ public class SignUpFormActivity extends AppCompatActivity implements View.OnClic
                                         public void onSuccess(Uri uri)
                                         {
                                             User user = new User(fName, lName, email, userUID, uri.toString());
-                                            mDatabaseRef.push().setValue(user);
+                                            mDatabaseRef.child(userUID).setValue(user);
                                             Snackbar.make(view, "Welcome: " + fName + " " + lName, Snackbar.LENGTH_LONG).show();
                                         }
                                     }).addOnFailureListener(new OnFailureListener()
@@ -389,7 +388,7 @@ public class SignUpFormActivity extends AppCompatActivity implements View.OnClic
                                                 {
                                                     Uri appBasedimg = taskSnapshot.getDownloadUrl();
                                                     User user = new User(fName, lName, email, userUID, appBasedimg.toString());
-                                                    mDatabaseRef.push().setValue(user);
+                                                    mDatabaseRef.child(userUID).setValue(user);
                                                     Snackbar.make(view, "Welcome: " + fName + " " + lName, Snackbar.LENGTH_LONG).show();
                                                 }
                                             }).addOnFailureListener(new OnFailureListener()
