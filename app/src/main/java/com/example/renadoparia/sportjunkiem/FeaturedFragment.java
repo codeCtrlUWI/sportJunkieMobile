@@ -26,12 +26,12 @@ public class FeaturedFragment extends Fragment
 {
 
     private static final String TAG = "FeaturedFragment";
-
     private static final String mArticleRef = "ARTICLES";
     private static final String QUERY_ALL_ARTICLES = "author";//Used author, but i think you could use any field
     private static final String QUERY_BY_CATEGORY = "category";
-    private DatabaseReference mDatabaseReference;
     private static FirebaseRecyclerAdapter<Article, ArticleViewHolder> mFireBaseRecyclerAdapter;
+
+    private DatabaseReference mDatabaseReference;
     private String mCategory;
     private String mTitle;
 

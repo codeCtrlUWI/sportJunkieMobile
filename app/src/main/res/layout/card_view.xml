@@ -50,6 +50,7 @@
             android:maxLines="1"
             android:textColor="@color/colorPrimaryText"
             android:textSize="@dimen/article_subheading"
+            android:textStyle="bold"
             tools:text="Title"/>
 
         <Button

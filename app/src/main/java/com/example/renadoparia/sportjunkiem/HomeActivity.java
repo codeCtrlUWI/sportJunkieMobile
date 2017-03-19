@@ -64,7 +64,12 @@ public class HomeActivity extends AppCompatActivity
         if (savedInstanceState != null)
         {
             menuState = savedInstanceState.getInt(MENU_TAG);
-            displaySelectedItem(menuState);
+            if (menuState == 0)
+            {
+                menuState = R.id.home;
+                displaySelectedItem(menuState);
+            }
+
         }
         else
         {
