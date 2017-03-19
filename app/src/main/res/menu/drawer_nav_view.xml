@@ -5,34 +5,30 @@
         <item
             android:id="@+id/home"
             android:icon="@drawable/ic_home_black_24dp"
-            android:title="Home"/>
+            android:title="@string/home"/>
         <item
             android:id="@+id/foosball"
             android:icon="@drawable/football"
-            android:title="Football"/>
+            android:title="@string/football"/>
         <item
             android:id="@+id/cricket"
             android:icon="@drawable/cricket"
-            android:title="Cricket"/>
+            android:title="@string/cricket"/>
         <item
             android:id="@+id/Swimming"
             android:icon="@drawable/swimming"
-            android:title="Swimming"/>
-        <item
-            android:id="@+id/MMA"
-            android:icon="@drawable/mma"
-            android:title="MMA"/>
+            android:title="@string/swimming"/>
     </group>
 
     <item
-        android:title="Account">
+        android:title="@string/account">
         <menu>
             <item
                 android:id="@+id/prof"
-                android:title="My Profile"/>
+                android:title="@string/my_profile"/>
             <item
                 android:id="@+id/loggo"
-                android:title="Log Out "/>
+                android:title="@string/log_out"/>
         </menu>
     </item>
 

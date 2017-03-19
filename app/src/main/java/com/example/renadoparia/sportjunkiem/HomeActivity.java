@@ -18,7 +18,6 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -33,18 +32,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HomeActivity extends AppCompatActivity
-        implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.OnConnectionFailedListener
+        implements NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.OnConnectionFailedListener
 {
     private static final String TAG = "HomeActivity";
     private static final String FOOTBALL_TAG = "Football";
     private static final String CRICKET_TAG = "Cricket";
+    private static final String SWIMMING_TAG = "Swimming";
+    private static final String KEY = "Tag";
+    public static final String NO_MENU_ITEM_SELECTED = "NO_QUERY";
 
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
     private GoogleApiClient mGoogleApiClient;
 
     private DrawerLayout mDrawerLayout;
-    private NavigationView mNavigationView;
+
+    private static final String MENU_TAG = "MENU_TAG";
+    private int menuState = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -55,23 +59,22 @@ public class HomeActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         initGoogleStuff();
-
         ViewPager viewPager = (ViewPager) findViewById(R.id.viewPager);
 
-        /*JUST TO TEST, FIX AFTER*/ //CHECK FOR SAVED STATES AFTER, IF NOT NULL, RELOAD WHERE THEY LAST WAS, ELSE, JUST YOLOLOLOL
+        if (savedInstanceState != null)
+        {
+            menuState = savedInstanceState.getInt(MENU_TAG);
+            displaySelectedItem(menuState);
+        }
+        else
+        {
+            loadHome(viewPager);
+        }
 
-        Fragment fragment = new FeaturedFragment();
-        Bundle bundle = new Bundle();
-        bundle.putString("Tag", "Home");
-        fragment.setArguments(bundle);
-        setUpViewPager(viewPager, fragment);
-
-        /*------------------------------------------*/
-        //Tabs Just To Test
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
 
-        mNavigationView = (NavigationView) findViewById(R.id.drawer_nav_view);
+        NavigationView navigationView = (NavigationView) findViewById(R.id.drawer_nav_view);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 
         ActionBar supportActionBar = getSupportActionBar();
@@ -90,7 +93,7 @@ public class HomeActivity extends AppCompatActivity
 
         mDrawerLayout.addDrawerListener(drawerToggle);
         drawerToggle.syncState();
-        mNavigationView.setNavigationItemSelectedListener(this);
+        navigationView.setNavigationItemSelectedListener(this);
 
         mAuth = FirebaseAuth.getInstance();
         mAuthStateListener = new FirebaseAuth.AuthStateListener()
@@ -113,6 +116,15 @@ public class HomeActivity extends AppCompatActivity
         };
     }
 
+    private void loadHome(ViewPager viewPager)
+    {
+        Bundle bundle = new Bundle();
+        Fragment fragment = new FeaturedFragment();
+        bundle.putString(KEY, NO_MENU_ITEM_SELECTED);
+        fragment.setArguments(bundle);
+        setUpViewPager(viewPager, fragment);
+    }
+
     private void initGoogleStuff()
     {
         GoogleSignInOptions googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -128,22 +140,42 @@ public class HomeActivity extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item)
     {
-        int id = item.getItemId();
-        final String KEY = "Tag";
+        displaySelectedItem(item.getItemId());
+        return true;
+    }
+
+    private void displaySelectedItem(int id)
+    {
         final ViewPager viewPager = (ViewPager) findViewById(R.id.viewPager);
         Fragment categoryFragment;
         Bundle bundle = new Bundle();
         switch (id)
         {
+            case R.id.home:
+                menuState = id;
+                categoryFragment = new FeaturedFragment();
+                bundle.putString(KEY, NO_MENU_ITEM_SELECTED);
+                categoryFragment.setArguments(bundle);
+                setUpViewPager(viewPager, categoryFragment);
+                break;
             case R.id.foosball:
+                menuState = id;
                 categoryFragment = new FeaturedFragment();
                 bundle.putString(KEY, FOOTBALL_TAG);
                 categoryFragment.setArguments(bundle);
                 setUpViewPager(viewPager, categoryFragment);
                 break;
             case R.id.cricket:
+                menuState = id;
                 categoryFragment = new FeaturedFragment();
                 bundle.putString(KEY, CRICKET_TAG);
+                categoryFragment.setArguments(bundle);
+                setUpViewPager(viewPager, categoryFragment);
+                break;
+            case R.id.Swimming:
+                menuState = id;
+                categoryFragment = new FeaturedFragment();
+                bundle.putString(KEY, SWIMMING_TAG);
                 categoryFragment.setArguments(bundle);
                 setUpViewPager(viewPager, categoryFragment);
                 break;
@@ -152,7 +184,6 @@ public class HomeActivity extends AppCompatActivity
                 break;
         }
         mDrawerLayout.closeDrawer(GravityCompat.START);
-        return true;
     }
 
     @Override
@@ -196,15 +227,6 @@ public class HomeActivity extends AppCompatActivity
         }
     }
 
-    @Override
-    public void onClick(View v)
-    {
-        int id = v.getId();
-        switch (id)
-        {
-
-        }
-    }
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult)
@@ -266,17 +288,35 @@ public class HomeActivity extends AppCompatActivity
         }
     }
 
-    private void setUpViewPager(ViewPager viewPager)
-    {
-        Adapter adapter = new Adapter(getSupportFragmentManager());
-        adapter.addFragment(new FeaturedFragment(), "Featured");
-        viewPager.setAdapter(adapter);
-    }
+//    private void setUpViewPager(ViewPager viewPager)
+//    {
+//        Adapter adapter = new Adapter(getSupportFragmentManager());
+//        adapter.addFragment(new FeaturedFragment(), "Featured");
+//        viewPager.setAdapter(adapter);
+//    }
 
     private void setUpViewPager(ViewPager viewPager, Fragment fragment)
     {
         Adapter adapter = new Adapter(getSupportFragmentManager());
         adapter.addFragment(fragment, "Featured");
         viewPager.setAdapter(adapter);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState)
+    {
+        Log.d(TAG, "onSaveInstanceState: called");
+        Log.d(TAG, "onSaveInstanceState: saving: " + menuState);
+        outState.putInt(MENU_TAG, menuState);
+        super.onSaveInstanceState(outState);
+    }
+    /*Should I Implement onRestoreInstanceState()?, Check out the difference between checking saved state in the onCreate
+* and on the onRestoreInstanceState()*/
+
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+        Log.d(TAG, "onResume: called");
     }
 }

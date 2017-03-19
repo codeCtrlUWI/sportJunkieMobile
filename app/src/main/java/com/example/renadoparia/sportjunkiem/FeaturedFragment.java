@@ -50,7 +50,16 @@ public class FeaturedFragment extends Fragment
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
     {
         Log.d(TAG, "onCreateView: starts");
-        Query queryArticles = mDatabaseReference.orderByChild("category").equalTo(mCategory);
+        Query queryArticles;
+        if (mCategory.equalsIgnoreCase(HomeActivity.NO_MENU_ITEM_SELECTED))
+        {
+            queryArticles = mDatabaseReference.orderByChild("author");
+        }
+        else
+        {
+            queryArticles = mDatabaseReference.orderByChild("category").equalTo(mCategory);
+        }
+
         Log.d(TAG, "onCreateView: we past the snapshot");
         RecyclerView recyclerView = (RecyclerView) inflater.inflate(R.layout.recycler_view, container, false);
         recyclerView.setHasFixedSize(true);
@@ -78,6 +87,22 @@ public class FeaturedFragment extends Fragment
         return recyclerView;
     }
 
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState)
+    {
+        super.onViewCreated(view, savedInstanceState);
+        String title;
+        if (mCategory.equalsIgnoreCase(HomeActivity.NO_MENU_ITEM_SELECTED))
+        {
+            title = getString(R.string.home);
+        }
+        else
+        {
+            title = mCategory;
+        }
+        getActivity().setTitle(title);
+    }
+
     private static class ArticleViewHolder extends RecyclerView.ViewHolder
     {
         private ImageView mSportPicture;
@@ -103,4 +128,38 @@ public class FeaturedFragment extends Fragment
 
     }
 
+    @Override
+    public void onStart()
+    {
+        super.onStart();
+        Log.d(TAG, "onStart: called");
+    }
+
+    @Override
+    public void onStop()
+    {
+        super.onStop();
+        Log.d(TAG, "onStop: called");
+    }
+
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+        Log.d(TAG, "onResume: called");
+    }
+
+    @Override
+    public void onPause()
+    {
+        super.onPause();
+        Log.d(TAG, "onPause: called");
+    }
+
+    @Override
+    public void onDestroy()
+    {
+        super.onDestroy();
+        Log.d(TAG, "onDestroy: destroyed call");
+    }
 }
