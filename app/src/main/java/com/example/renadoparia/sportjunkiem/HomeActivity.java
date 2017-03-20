@@ -63,16 +63,21 @@ public class HomeActivity extends AppCompatActivity
 
         if (savedInstanceState != null)
         {
+            Log.d(TAG, "onCreate: Saved Instance State Is Not Null");
             menuState = savedInstanceState.getInt(MENU_TAG);
             if (menuState == 0)
             {
                 menuState = R.id.home;
                 displaySelectedItem(menuState);
             }
-
+            else
+            {
+                displaySelectedItem(menuState);
+            }
         }
         else
         {
+            Log.d(TAG, "onCreate: There is No Saved State");
             loadHome(viewPager);
         }
 
@@ -156,6 +161,8 @@ public class HomeActivity extends AppCompatActivity
         Bundle bundle = new Bundle();
         switch (id)
         {
+            /*I only passed variables because i was using a fragment for differnet queries, but i don't need to anymore
+            * for the featured fragment, but i too damn lazy and it ain't doing anybody no harm, so i gonna leave it*/
             case R.id.home:
                 menuState = id;
                 categoryFragment = new FeaturedFragment();
@@ -164,28 +171,31 @@ public class HomeActivity extends AppCompatActivity
                 setUpViewPager(viewPager, categoryFragment);
                 break;
             case R.id.foosball:
-                menuState = id;
-                categoryFragment = new FeaturedFragment();
+                categoryFragment = new FeaturedCategoryFragment();
                 bundle.putString(KEY, FOOTBALL_TAG);
                 categoryFragment.setArguments(bundle);
                 setUpViewPager(viewPager, categoryFragment);
+                menuState = id;
                 break;
             case R.id.cricket:
                 menuState = id;
-                categoryFragment = new FeaturedFragment();
+                categoryFragment = new FeaturedCategoryFragment();
                 bundle.putString(KEY, CRICKET_TAG);
                 categoryFragment.setArguments(bundle);
                 setUpViewPager(viewPager, categoryFragment);
                 break;
             case R.id.Swimming:
-                menuState = id;
-                categoryFragment = new FeaturedFragment();
+                categoryFragment = new FeaturedCategoryFragment();
                 bundle.putString(KEY, SWIMMING_TAG);
                 categoryFragment.setArguments(bundle);
                 setUpViewPager(viewPager, categoryFragment);
+                menuState = id;
                 break;
             case R.id.loggo:
                 signOut();
+                break;
+            default:
+                menuState = R.id.home;
                 break;
         }
         mDrawerLayout.closeDrawer(GravityCompat.START);

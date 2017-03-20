@@ -19,7 +19,7 @@ class Article
     private long mTimeAndDateCreated;
     private String mLastUpdated;
     private String mUrlToImage;
-    private int mNumberOfClicks;
+    private long mNumberOfClicks;
     private List<String> mGalleryImages;
 
     public Article()
@@ -28,7 +28,7 @@ class Article
 
     //private String mLinkToArticle;
     /*This may be added, for sharing purposes later on, if it is added, remember to remake constructors accordingly*/
-    public Article(String articleID, String authorUID, String authorFname, String authorLname, String title, String subtitle, String articleData, String category, long timeAndDateCreated, String lastUpdated, String urlToImage, int numberOfClicks, List<String> galleryImages)
+    public Article(String articleID, String authorUID, String authorFname, String authorLname, String title, String subtitle, String articleData, String category, long timeAndDateCreated, String lastUpdated, String urlToImage, long numberOfClicks, List<String> galleryImages)
     {
         mArticleID = articleID;
         mAuthorUID = authorUID;
@@ -60,6 +60,24 @@ class Article
         mUrlToImage = urlToImage;
         mNumberOfClicks = 0;
         mGalleryImages = galleryImages;
+    }
+
+    public Article
+            (String articleID, String authorUID, String authorFname, String authorLname, String title, String subtitle, String articleData, String category, long timeAndDateCreated, String lastUpdated, String urlToImage, long numberOfClicks)
+    {
+        mArticleID = articleID;
+        mAuthorUID = authorUID;
+        mAuthorFname = authorFname;
+        mAuthorLname = authorLname;
+        mTitle = title;
+        mSubtitle = subtitle;
+        mArticleData = articleData;
+        mCategory = category;
+        mTimeAndDateCreated = timeAndDateCreated;
+        mLastUpdated = lastUpdated;
+        mUrlToImage = urlToImage;
+        mNumberOfClicks = numberOfClicks;
+        mGalleryImages = null;
     }
 
     public String getArticleID()
@@ -172,12 +190,12 @@ class Article
         mUrlToImage = urlToImage;
     }
 
-    public int getNumberOfClicks()
+    public long getNumberOfClicks()
     {
         return mNumberOfClicks;
     }
 
-    public void setNumberOfClicks(int numberOfClicks)
+    public void setNumberOfClicks(long numberOfClicks)
     {
         mNumberOfClicks = numberOfClicks;
     }
@@ -196,19 +214,19 @@ class Article
     public String toString()
     {
         return "{" +
-                "mArticleID='" + mArticleID + '\'' +
-                ", mAuthorUID='" + mAuthorUID + '\'' +
-                ", mAuthorFname='" + mAuthorFname + '\'' +
-                ", mAuthorLname='" + mAuthorLname + '\'' +
-                ", mTitle='" + mTitle + '\'' +
-                ", mSubtitle='" + mSubtitle + '\'' +
-                ", mArticleData='" + mArticleData + '\'' +
-                ", mCategory='" + mCategory + '\'' +
-                ", mTimeAndDateCreated=" + mTimeAndDateCreated +
-                ", mLastUpdated='" + mLastUpdated + '\'' +
-                ", mUrlToImage='" + mUrlToImage + '\'' +
-                ", mNumberOfClicks=" + mNumberOfClicks +
-                ", mGalleryImages=" + mGalleryImages + '}';
+                "\"mArticleID\":\"" + mArticleID + "\"," +
+                "\"mAuthorUID\":\"" + mAuthorUID + "\"," +
+                "\"mAuthorFname\":\"" + mAuthorFname + "\"," +
+                "\"mAuthorLname\":\"" + mAuthorLname + "\"," +
+                "\"mTitle\":\"" + mTitle + "\"," +
+                "\"mSubtitle\":\"" + mSubtitle + "\"," +
+                "\"mArticleData\":\"" + mArticleData + "\"," +
+                "\"mCategory\":\"" + mCategory + "\"," +
+                "\"mTimeAndDateCreated\":\"" + mTimeAndDateCreated + "\"," +
+                "\"mLastUpdated\":\"" + mLastUpdated + "\"," +
+                "\"mUrlToImage\":\"" + mUrlToImage + "\"," +
+                "\"mNumberOfClicks\":\"" + mNumberOfClicks + "\"," +
+                "\"mGalleryImages\":\"" + mGalleryImages + "\"" + '}';
     }
 }
 

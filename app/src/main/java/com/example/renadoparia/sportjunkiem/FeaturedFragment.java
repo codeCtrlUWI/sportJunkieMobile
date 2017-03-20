@@ -18,6 +18,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.squareup.picasso.Picasso;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 /**
  * Created by Renado_Paria on 3/18/2017 at 5:29 AM.
  */
@@ -27,8 +30,7 @@ public class FeaturedFragment extends Fragment
 
     private static final String TAG = "FeaturedFragment";
     private static final String mArticleRef = "ARTICLES";
-    private static final String QUERY_ALL_ARTICLES = "author";//Used author, but i think you could use any field
-    private static final String QUERY_BY_CATEGORY = "category";
+    private static final String QUERY_ALL_ARTICLES = "numberOfClicks";
     private static FirebaseRecyclerAdapter<Article, ArticleViewHolder> mFireBaseRecyclerAdapter;
 
     private DatabaseReference mDatabaseReference;
@@ -48,22 +50,29 @@ public class FeaturedFragment extends Fragment
         Log.d(TAG, "onCreate: tag: " + mCategory);
     }
 
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
     {
+        /*THIS BELOW SECTION IS FOR TESTING PURPOSES ALONE*/
+
+//        Query queryArticles;
+//        Log.d(TAG, "onCreateView: Hello From Testing Section ");
+//        Log.d(TAG, "onCreateView: category: " + mCategory);
+//        queryArticles = mDatabaseReference.orderByChild(QUERY_BY_CATEGORY).equalTo(mCategory);
+//        queryArticles.addValueEventListener(this);
+//        Log.d(TAG, "onCreateView: testQuery: " + queryArticles);
+        /*THIS ABOVE SECTION IS FOR TESTING ALONE*/
+
         Log.d(TAG, "onCreateView: starts");
-        Query queryArticles;
+        Query queryArticles = null;
         if (mCategory.equalsIgnoreCase(HomeActivity.NO_MENU_ITEM_SELECTED))
         {
-            queryArticles = mDatabaseReference.orderByChild(QUERY_ALL_ARTICLES);
+            queryArticles = mDatabaseReference.orderByChild(QUERY_ALL_ARTICLES).startAt(0).endAt(Integer.MAX_VALUE);
             mTitle = getString(R.string.home);
         }
-        else
-        {
-            queryArticles = mDatabaseReference.orderByChild(QUERY_BY_CATEGORY).equalTo(mCategory);
-            mTitle = mCategory;
-        }
+
         RecyclerView recyclerView = (RecyclerView) inflater.inflate(R.layout.recycler_view, container, false);
         recyclerView.setHasFixedSize(true);
         mFireBaseRecyclerAdapter = new FirebaseRecyclerAdapter<Article, ArticleViewHolder>(
@@ -94,7 +103,6 @@ public class FeaturedFragment extends Fragment
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
-
         getActivity().setTitle(mTitle);
     }
 
@@ -117,6 +125,17 @@ public class FeaturedFragment extends Fragment
                 public void onClick(View v)
                 {
                     Log.d(TAG, "onClick: " + mFireBaseRecyclerAdapter.getItem(getAdapterPosition()).toString());
+                    JSONObject jsonObject;
+                    try
+                    {
+                        jsonObject = new JSONObject(mFireBaseRecyclerAdapter.getItem(getAdapterPosition()).toString());
+                        Log.d(TAG, "onClick: json: " + jsonObject.toString());
+                    }
+                    catch (JSONException e)
+                    {
+                        e.printStackTrace();
+                    }
+
                 }
             });
         }
