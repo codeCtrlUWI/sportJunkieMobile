@@ -80,7 +80,7 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Artic
         TextView mCategory;
         TextView mTitle;
 
-        public ArticleViewHolder(final View itemView)
+        ArticleViewHolder(final View itemView)
         {
             super(itemView);
             mSportPicture = (ImageView) itemView.findViewById(R.id.card_image);
@@ -92,7 +92,15 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Artic
                 @Override
                 public void onClick(View v)
                 {
-                    Log.d(TAG, "onClick: Article Has Been Clicked ");
+                    Log.d(TAG, "onClick: view clicked");
+                }
+            });
+            itemView.findViewById(R.id.share_button).setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View v)
+                {
+                    Log.d(TAG, "onClick: Share Button Clicked");
                 }
             });
         }

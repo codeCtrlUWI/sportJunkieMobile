@@ -10,27 +10,32 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
-import com.squareup.picasso.Picasso;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
 
 /**
  * Created by Renado_Paria on 3/18/2017 at 5:29 AM.
  */
 
-public class FeaturedFragment extends Fragment
+public class FeaturedFragment extends Fragment implements ValueEventListener
 {
 
     private static final String TAG = "FeaturedFragment";
     private static final String mArticleRef = "ARTICLES";
     private static final String QUERY_ALL_ARTICLES = "numberOfClicks";
-    private static FirebaseRecyclerAdapter<Article, RecyclerViewAdapter.ArticleViewHolder> mFireBaseRecyclerAdapter;
 
     private DatabaseReference mDatabaseReference;
     private String mCategory;
     private String mTitle;
+
+    private RecyclerViewAdapter mRecyclerViewAdapter;
+
 
     public FeaturedFragment()
     {
@@ -42,6 +47,14 @@ public class FeaturedFragment extends Fragment
         super.onCreate(savedInstanceState);
         mDatabaseReference = FirebaseDatabase.getInstance().getReference().child(mArticleRef);
         mCategory = getArguments().getString("Tag");
+        Query queryArticles;
+
+        if (mCategory != null && mCategory.equalsIgnoreCase(HomeActivity.NO_MENU_ITEM_SELECTED))
+        {
+            queryArticles = mDatabaseReference.orderByChild(QUERY_ALL_ARTICLES).startAt(0).endAt(Long.MAX_VALUE);
+            queryArticles.addValueEventListener(this);
+            mTitle = getString(R.string.home);
+        }
         Log.d(TAG, "onCreate: tag: " + mCategory);
     }
 
@@ -61,37 +74,66 @@ public class FeaturedFragment extends Fragment
         /*THIS ABOVE SECTION IS FOR TESTING ALONE*/
 
         Log.d(TAG, "onCreateView: starts");
-        Query queryArticles = null;
-        if (mCategory.equalsIgnoreCase(HomeActivity.NO_MENU_ITEM_SELECTED))
-        {
-            queryArticles = mDatabaseReference.orderByChild(QUERY_ALL_ARTICLES).startAt(0).endAt(Long.MAX_VALUE);
-            mTitle = getString(R.string.home);
-        }
+
 
         RecyclerView recyclerView = (RecyclerView) inflater.inflate(R.layout.recycler_view, container, false);
         recyclerView.setHasFixedSize(true);
-        mFireBaseRecyclerAdapter = new FirebaseRecyclerAdapter<Article, RecyclerViewAdapter.ArticleViewHolder>(
-                Article.class,
-                R.layout.card_view,
-                RecyclerViewAdapter.ArticleViewHolder.class,
-                queryArticles)
-        {
-            @Override
-            protected void populateViewHolder(RecyclerViewAdapter.ArticleViewHolder viewHolder, Article model, int position)
-            {
-                viewHolder.mCategory.setText(model.getCategory());
-                viewHolder.mTitle.setText(model.getTitle());
-                Picasso.with(getContext())
-                        .load(model.getUrlToImage())
-                        .error(R.drawable.ic_image_black_48dp)
-                        .into(viewHolder.mSportPicture);
-            }
-        };
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, true);
         linearLayoutManager.setStackFromEnd(true);
         recyclerView.setLayoutManager(linearLayoutManager);
-        recyclerView.setAdapter(mFireBaseRecyclerAdapter);
+        mRecyclerViewAdapter = new RecyclerViewAdapter(new ArrayList<Article>(), getContext());
+        recyclerView.setAdapter(mRecyclerViewAdapter);
+
         return recyclerView;
+    }
+
+    @Override
+    public void onDataChange(DataSnapshot dataSnapshot)
+    {
+        ArrayList<Article> articleArrayList = new ArrayList<>();
+        Article article;
+        for (DataSnapshot snapData : dataSnapshot.getChildren())
+        {
+            String authorUID = (String) snapData.child("authorUID").getValue();
+            String articleID = (String) snapData.child("articleID").getValue();
+            String authorFname = (String) snapData.child("authorFname").getValue();
+            String authorLname = (String) snapData.child("authorLname").getValue();
+
+            String category = (String) snapData.child("category").getValue();
+            String lastUpdated = (String) snapData.child("lastUpdated").getValue();
+            long numberOfClicks = (Long) snapData.child("numberOfClicks").getValue();
+            String subTitle = (String) snapData.child("subtitle").getValue();
+
+            long timeAndDateCreated = (Long) snapData.child("timeAndDateCreated").getValue();
+            String title = (String) snapData.child("title").getValue();
+            String urlToImage = (String) snapData.child("urlToImage").getValue();
+            String articleData = (String) snapData.child("articleData").getValue();
+
+            article =
+                    new Article
+                            (articleID,
+                                    authorUID,
+                                    authorFname,
+                                    authorLname,
+                                    title,
+                                    subTitle,
+                                    articleData,
+                                    category,
+                                    timeAndDateCreated,
+                                    lastUpdated,
+                                    urlToImage,
+                                    numberOfClicks);
+
+            Log.d(TAG, "onDataChange: We should be adding to the list by now ");
+            articleArrayList.add(article);
+        }
+        mRecyclerViewAdapter.loadArticleData(articleArrayList);
+    }
+
+    @Override
+    public void onCancelled(DatabaseError databaseError)
+    {
+
     }
 
     @Override

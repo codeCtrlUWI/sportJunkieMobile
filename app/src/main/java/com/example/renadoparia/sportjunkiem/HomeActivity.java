@@ -48,7 +48,7 @@ public class HomeActivity extends AppCompatActivity
     private DrawerLayout mDrawerLayout;
 
     private static final String MENU_TAG = "MENU_TAG";
-    private int menuState = 0;
+    private int menuState;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -154,6 +154,20 @@ public class HomeActivity extends AppCompatActivity
         return true;
     }
 
+    @Override
+    public void onBackPressed()
+    {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START))
+        {
+            drawer.closeDrawer(GravityCompat.START);
+        }
+        else
+        {
+            super.onBackPressed();
+        }
+    }
+
     private void displaySelectedItem(int id)
     {
         final ViewPager viewPager = (ViewPager) findViewById(R.id.viewPager);
@@ -246,7 +260,6 @@ public class HomeActivity extends AppCompatActivity
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult)
     {
-
     }
 
 
@@ -325,13 +338,26 @@ public class HomeActivity extends AppCompatActivity
         outState.putInt(MENU_TAG, menuState);
         super.onSaveInstanceState(outState);
     }
-    /*Should I Implement onRestoreInstanceState()?, Check out the difference between checking saved state in the onCreate
-* and on the onRestoreInstanceState()*/
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState)
+    {
+        super.onRestoreInstanceState(savedInstanceState);
+        menuState = savedInstanceState.getInt(MENU_TAG);
+        Log.d(TAG, "onRestoreInstanceState: Restored: " + menuState);
+    }
 
     @Override
     protected void onResume()
     {
         super.onResume();
         Log.d(TAG, "onResume: called");
+    }
+
+    @Override
+    protected void onPause()
+    {
+        super.onPause();
+        Log.d(TAG, "onPause: called");
     }
 }
