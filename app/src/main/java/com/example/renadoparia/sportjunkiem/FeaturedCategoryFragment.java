@@ -3,6 +3,8 @@ package com.example.renadoparia.sportjunkiem;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,7 +32,7 @@ public class FeaturedCategoryFragment extends Fragment implements ValueEventList
     private static final String mArticleRef = "ARTICLES";
     private static final String QUERY_BY_CATEGORY = "category";
 
-    private DatabaseReference mDatabaseReference;
+    private RecyclerViewAdapter mRecyclerViewAdapter;
 
 
     public FeaturedCategoryFragment()
@@ -41,11 +43,11 @@ public class FeaturedCategoryFragment extends Fragment implements ValueEventList
     public void onCreate(@Nullable Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        mDatabaseReference = FirebaseDatabase.getInstance().getReference().child(mArticleRef);
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child(mArticleRef);
         mCategory = getArguments().getString("Tag");
         Log.d(TAG, "onCreate: tag: " + mCategory);
 
-        Query queryCategory = mDatabaseReference.orderByChild(QUERY_BY_CATEGORY).equalTo(mCategory);
+        Query queryCategory = databaseReference.orderByChild(QUERY_BY_CATEGORY).equalTo(mCategory);
         Log.d(TAG, "onCreate: query: " + queryCategory.toString());
         queryCategory.addValueEventListener(this);
     }
@@ -54,15 +56,27 @@ public class FeaturedCategoryFragment extends Fragment implements ValueEventList
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
     {
-
-        return super.onCreateView(inflater, container, savedInstanceState);
+        Log.d(TAG, "onCreateView: here we are");
+        RecyclerView recyclerView = (RecyclerView) inflater.inflate(R.layout.recycler_view, container, false);
+        recyclerView.setHasFixedSize(true);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
+        recyclerView.setLayoutManager(linearLayoutManager);
+        mRecyclerViewAdapter = new RecyclerViewAdapter(new ArrayList<Article>(), getContext());
+        recyclerView.setAdapter(mRecyclerViewAdapter);
+        return recyclerView;
     }
 
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState)
+    {
+        super.onViewCreated(view, savedInstanceState);
+        getActivity().setTitle(mCategory);
+    }
 
     @Override
     public void onDataChange(DataSnapshot dataSnapshot)
     {
-        ArrayList<Article> artylisty = new ArrayList<>();
+        ArrayList<Article> articleArrayList = new ArrayList<>();
         Article article;
         for (DataSnapshot snapData : dataSnapshot.getChildren())
         {
@@ -97,9 +111,9 @@ public class FeaturedCategoryFragment extends Fragment implements ValueEventList
                                     numberOfClicks);
 
             Log.d(TAG, "onDataChange: We should be adding to the list by now ");
-            artylisty.add(article);
+            articleArrayList.add(article);
         }
-        Collections.sort(artylisty, new Comparator<Article>()
+        Collections.sort(articleArrayList, new Comparator<Article>()
         {
             @Override
             public int compare(Article o1, Article o2)
@@ -114,9 +128,9 @@ public class FeaturedCategoryFragment extends Fragment implements ValueEventList
                 }
             }
         });
-        /*NEXT STEPS, STORE THE ARRAY LIST, LOAD IT INTO THE RECYCLER VIEW, LOAD VIEW, PROFIT*/
-        Log.d(TAG, "onDataChange: list: " + artylisty.toString());
-        Log.d(TAG, "onDataChange: CURRENT SIZE OF LIST: " + artylisty.size());
+        mRecyclerViewAdapter.loadArticleData(articleArrayList);
+        Log.d(TAG, "onDataChange: list: " + articleArrayList.toString());
+        Log.d(TAG, "onDataChange: CURRENT SIZE OF LIST: " + articleArrayList.size());
     }
 
     @Override

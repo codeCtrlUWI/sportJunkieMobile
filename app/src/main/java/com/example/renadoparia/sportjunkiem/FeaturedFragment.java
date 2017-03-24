@@ -9,17 +9,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.squareup.picasso.Picasso;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  * Created by Renado_Paria on 3/18/2017 at 5:29 AM.
@@ -31,7 +26,7 @@ public class FeaturedFragment extends Fragment
     private static final String TAG = "FeaturedFragment";
     private static final String mArticleRef = "ARTICLES";
     private static final String QUERY_ALL_ARTICLES = "numberOfClicks";
-    private static FirebaseRecyclerAdapter<Article, ArticleViewHolder> mFireBaseRecyclerAdapter;
+    private static FirebaseRecyclerAdapter<Article, RecyclerViewAdapter.ArticleViewHolder> mFireBaseRecyclerAdapter;
 
     private DatabaseReference mDatabaseReference;
     private String mCategory;
@@ -69,20 +64,20 @@ public class FeaturedFragment extends Fragment
         Query queryArticles = null;
         if (mCategory.equalsIgnoreCase(HomeActivity.NO_MENU_ITEM_SELECTED))
         {
-            queryArticles = mDatabaseReference.orderByChild(QUERY_ALL_ARTICLES).startAt(0).endAt(Integer.MAX_VALUE);
+            queryArticles = mDatabaseReference.orderByChild(QUERY_ALL_ARTICLES).startAt(0).endAt(Long.MAX_VALUE);
             mTitle = getString(R.string.home);
         }
 
         RecyclerView recyclerView = (RecyclerView) inflater.inflate(R.layout.recycler_view, container, false);
         recyclerView.setHasFixedSize(true);
-        mFireBaseRecyclerAdapter = new FirebaseRecyclerAdapter<Article, ArticleViewHolder>(
+        mFireBaseRecyclerAdapter = new FirebaseRecyclerAdapter<Article, RecyclerViewAdapter.ArticleViewHolder>(
                 Article.class,
                 R.layout.card_view,
-                ArticleViewHolder.class,
+                RecyclerViewAdapter.ArticleViewHolder.class,
                 queryArticles)
         {
             @Override
-            protected void populateViewHolder(ArticleViewHolder viewHolder, Article model, int position)
+            protected void populateViewHolder(RecyclerViewAdapter.ArticleViewHolder viewHolder, Article model, int position)
             {
                 viewHolder.mCategory.setText(model.getCategory());
                 viewHolder.mTitle.setText(model.getTitle());
@@ -106,41 +101,6 @@ public class FeaturedFragment extends Fragment
         getActivity().setTitle(mTitle);
     }
 
-    private static class ArticleViewHolder extends RecyclerView.ViewHolder
-    {
-        private ImageView mSportPicture;
-        private TextView mCategory;
-        private TextView mTitle;
-
-        public ArticleViewHolder(View itemView)
-        {
-            super(itemView);
-            mSportPicture = (ImageView) itemView.findViewById(R.id.card_image);
-            mCategory = (TextView) itemView.findViewById(R.id.card_category);
-            mTitle = (TextView) itemView.findViewById(R.id.card_title);
-
-            itemView.setOnClickListener(new View.OnClickListener()
-            {
-                @Override
-                public void onClick(View v)
-                {
-                    Log.d(TAG, "onClick: " + mFireBaseRecyclerAdapter.getItem(getAdapterPosition()).toString());
-                    JSONObject jsonObject;
-                    try
-                    {
-                        jsonObject = new JSONObject(mFireBaseRecyclerAdapter.getItem(getAdapterPosition()).toString());
-                        Log.d(TAG, "onClick: json: " + jsonObject.toString());
-                    }
-                    catch (JSONException e)
-                    {
-                        e.printStackTrace();
-                    }
-
-                }
-            });
-        }
-
-    }
 
     @Override
     public void onStart()
@@ -174,6 +134,6 @@ public class FeaturedFragment extends Fragment
     public void onDestroy()
     {
         super.onDestroy();
-        Log.d(TAG, "onDestroy: destroyed call");
+        Log.d(TAG, "onDestroy: destroyed called");
     }
 }
