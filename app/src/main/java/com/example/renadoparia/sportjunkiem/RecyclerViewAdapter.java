@@ -9,6 +9,12 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.MutableData;
+import com.google.firebase.database.Transaction;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -23,6 +29,8 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Artic
     private List<Article> mArticleList;
     private Context mContext;
 
+    private DatabaseReference mDatabaseReference;
+
     public RecyclerViewAdapter(List<Article> articleList, Context context)
     {
         mArticleList = articleList;
@@ -32,7 +40,7 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Artic
     @Override
     public ArticleViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
     {
-        Log.d(TAG, "onCreateViewHolder: new View");
+        //Log.d(TAG, "onCreateViewHolder: new View");
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_view, parent, false);
         return new ArticleViewHolder(view);
     }
@@ -40,8 +48,8 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Artic
     @Override
     public void onBindViewHolder(ArticleViewHolder holder, int position)
     {
-        Log.d(TAG, "onBindViewHolder: called: ");
-        Article actualArticle = mArticleList.get(position);
+        // Log.d(TAG, "onBindViewHolder: called: ");
+        final Article actualArticle = mArticleList.get(position);
         holder.mCategory.setText(actualArticle.getCategory());
         holder.mTitle.setText(actualArticle.getTitle());
         Picasso.with(mContext)
@@ -49,12 +57,55 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Artic
                 .error(R.drawable.ic_image_black_48dp)
                 .into(holder.mSportPicture);
 
+        holder.itemView.setOnClickListener(new View.OnClickListener()    //TODO:Implement Call Backs To Clean Up OnBindViewHolder Code
+        {
+            @Override
+            public void onClick(View v)
+            {
+                String id = actualArticle.getArticleID();
+                Log.d(TAG, "onClick: Article Id: " + id);
+                updateArticleClicks(id);
+            }
+        });
+    }
+
+    //https://firebase.google.com/docs/database/admin/save-data#section-update
+    private void updateArticleClicks(String id)
+    {
+        final String articleRef = "ARTICLES";
+        final String numClicksRef = "numberOfClicks";
+        mDatabaseReference = FirebaseDatabase.getInstance().getReference().child(articleRef).child(id).child(numClicksRef);
+        mDatabaseReference.runTransaction(new Transaction.Handler()
+        {
+            @Override
+            public Transaction.Result doTransaction(MutableData mutableData)
+            {
+                Long currentValue = mutableData.getValue(Long.class);
+                if (currentValue == null || currentValue < 0)
+                {
+                    mutableData.setValue(1);
+                }
+                else
+                {
+                    mutableData.setValue(currentValue + 1);
+                }
+                return Transaction.success(mutableData);
+            }
+
+            @Override
+            public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot)
+            {
+                Log.d(TAG, "onComplete: Transaction Completed");
+            }
+        });
+        Log.d(TAG, "updateArticleClicks: " + mDatabaseReference.toString());
+
+
     }
 
     @Override
     public int getItemCount()
     {
-        Log.d(TAG, "getItemCount: called");
         if ((mArticleList != null) && (mArticleList.size() != 0))
         {
             return mArticleList.size();
@@ -67,12 +118,23 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Artic
 
     void loadArticleData(List<Article> articleList)
     {
-        Log.d(TAG, "loadArticleData: load Article Called " + articleList.toString());
+        // Log.d(TAG, "loadArticleData: load Article Called " + articleList.toString());
         mArticleList = articleList;
         notifyDataSetChanged();
-        Log.d(TAG, "loadArticleData: load Article Ended: ");
+        //Log.d(TAG, "loadArticleData: load Article Ended: ");
     }
 
+    public Article getArticle(int position)
+    {
+        if ((mArticleList != null) && (mArticleList.size() != 0))
+        {
+            return mArticleList.get(position);
+        }
+        else
+        {
+            return null;
+        }
+    }
 
     static class ArticleViewHolder extends RecyclerView.ViewHolder
     {
@@ -86,25 +148,7 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Artic
             mSportPicture = (ImageView) itemView.findViewById(R.id.card_image);
             mCategory = (TextView) itemView.findViewById(R.id.card_category);
             mTitle = (TextView) itemView.findViewById(R.id.card_title);
-
-            itemView.setOnClickListener(new View.OnClickListener()
-            {
-                @Override
-                public void onClick(View v)
-                {
-                    Log.d(TAG, "onClick: view clicked");
-                }
-            });
-            itemView.findViewById(R.id.share_button).setOnClickListener(new View.OnClickListener()
-            {
-                @Override
-                public void onClick(View v)
-                {
-                    Log.d(TAG, "onClick: Share Button Clicked");
-                }
-            });
         }
-
     }
 }
 

@@ -52,6 +52,7 @@ public class FeaturedCategoryFragment extends Fragment implements ValueEventList
         queryCategory.addValueEventListener(this);
     }
 
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
@@ -61,8 +62,10 @@ public class FeaturedCategoryFragment extends Fragment implements ValueEventList
         recyclerView.setHasFixedSize(true);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
         recyclerView.setLayoutManager(linearLayoutManager);
+
         mRecyclerViewAdapter = new RecyclerViewAdapter(new ArrayList<Article>(), getContext());
         recyclerView.setAdapter(mRecyclerViewAdapter);
+
         return recyclerView;
     }
 
@@ -132,6 +135,7 @@ public class FeaturedCategoryFragment extends Fragment implements ValueEventList
         Log.d(TAG, "onDataChange: list: " + articleArrayList.toString());
         Log.d(TAG, "onDataChange: CURRENT SIZE OF LIST: " + articleArrayList.size());
     }
+
 
     @Override
     public void onCancelled(DatabaseError databaseError)

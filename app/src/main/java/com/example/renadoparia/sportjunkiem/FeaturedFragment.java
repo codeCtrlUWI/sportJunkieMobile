@@ -36,7 +36,6 @@ public class FeaturedFragment extends Fragment implements ValueEventListener
 
     private RecyclerViewAdapter mRecyclerViewAdapter;
 
-
     public FeaturedFragment()
     {
     }
