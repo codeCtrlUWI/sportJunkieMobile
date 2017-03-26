@@ -35,6 +35,14 @@
             android:name=".HomeActivity"
             android:theme="@style/FullScreen">
         </activity>
+        <activity
+            android:name=".ArticleDetailActivity"
+            android:theme="@style/FullScreen">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.renadoparia.sportjunkiem.HomeActivity">
+            </meta-data>
+        </activity>
     </application>
 
 </manifest>

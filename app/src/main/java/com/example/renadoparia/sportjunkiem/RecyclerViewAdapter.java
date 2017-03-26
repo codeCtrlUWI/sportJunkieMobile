@@ -1,6 +1,7 @@
 package com.example.renadoparia.sportjunkiem;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -65,8 +66,38 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Artic
                 String id = actualArticle.getArticleID();
                 Log.d(TAG, "onClick: Article Id: " + id);
                 updateArticleClicks(id);
+                goToActualArticle(actualArticle);
             }
         });
+        holder.itemView.findViewById(R.id.share_button).setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                sharedIntent(actualArticle);
+            }
+        });
+
+        holder.itemView.findViewById(R.id.read_more).setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                String id = actualArticle.getArticleID();
+                updateArticleClicks(id);
+                goToActualArticle(actualArticle);
+            }
+        });
+    }
+
+    //    http://stackoverflow.com/questions/4197135/how-to-start-activity-in-adapter
+    private void sharedIntent(Article actualArticle)
+    {
+        Intent shareIntent = new Intent();
+        shareIntent.setAction(Intent.ACTION_SEND);
+        shareIntent.putExtra(Intent.EXTRA_TEXT, actualArticle.getTitle() + " - " + actualArticle.getUrlToImage());
+        shareIntent.setType("text/plain");
+        mContext.startActivity(Intent.createChooser(shareIntent, "Share With.."));
     }
 
     //https://firebase.google.com/docs/database/admin/save-data#section-update
@@ -101,6 +132,14 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Artic
         Log.d(TAG, "updateArticleClicks: " + mDatabaseReference.toString());
 
 
+    }
+
+    private void goToActualArticle(Article article)
+    {
+        final String key = "articledata";
+        Intent fullArticle = new Intent(mContext, ArticleDetailActivity.class);
+        fullArticle.putExtra(key, article.toString());
+        mContext.startActivity(fullArticle);
     }
 
     @Override
