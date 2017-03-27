@@ -135,6 +135,7 @@
                 android:id="@+id/articleData"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_gravity="start"
                 android:layout_marginBottom="16dp"
                 android:layout_marginTop="32dp"
                 android:fontFamily="serif"
@@ -143,9 +144,24 @@
                 android:textSize="18sp"
                 tools:text="ArticleData"/>
 
-            <View
-                style="@style/Divider"
-                android:layout_margin="16dp"/>
+            <include layout="@layout/author_related_divider"/>
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/author_related_articles"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="@dimen/md_keylines"
+                android:layout_marginTop="@dimen/md_keylines"/>
+
+            <include layout="@layout/also_like"/>
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/related_articles"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="@dimen/md_keylines"
+                android:layout_marginTop="@dimen/md_keylines"/>
+
         </LinearLayout>
 
     </android.support.v4.widget.NestedScrollView>

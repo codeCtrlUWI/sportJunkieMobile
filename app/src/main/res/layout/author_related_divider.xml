@@ -13,7 +13,7 @@
         android:layout_centerInParent="true"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
-        android:text="@string/article_photos"
+        android:text="@string/also_from_this_author"
         android:textAllCaps="true"
         android:textColor="@color/colorPrimaryText"
         android:textSize="18sp"
