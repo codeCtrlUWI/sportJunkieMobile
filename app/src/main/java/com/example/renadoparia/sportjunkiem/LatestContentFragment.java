@@ -3,6 +3,7 @@ package com.example.renadoparia.sportjunkiem;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -20,23 +21,25 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 
 /**
- * Created by Renado on 3/18/2017 at 10:21 PM for SportJunkieM.
+ * Created by Renado_Paria on 3/27/2017 at 10:17 PM.
  */
 
-public class FeaturedFragment extends Fragment implements ValueEventListener
+public class LatestContentFragment extends Fragment implements ValueEventListener
 {
-
-    private static final String TAG = "FeaturedFragment";
     private static final String mArticleRef = "ARTICLES";
-    private static final String QUERY_ALL_ARTICLES = "numberOfClicks";
 
     private DatabaseReference mDatabaseReference;
     private String mCategory;
     private String mTitle;
 
-    private RecyclerViewAdapter mRecyclerViewAdapter;
+    private static final String TAG = "LatestContentFragment";
 
-    public FeaturedFragment()
+    private static final String QUERY_BY_AUTHOR_ID = "authorUID";
+    private static final String QUERY_BY_CATEGORY = "category";
+
+    private LatestViewRecyclerAdapter mLatestViewAdapter;
+
+    public LatestContentFragment()
     {
     }
 
@@ -47,43 +50,40 @@ public class FeaturedFragment extends Fragment implements ValueEventListener
         mDatabaseReference = FirebaseDatabase.getInstance().getReference().child(mArticleRef);
         mCategory = getArguments().getString("Tag");
         Query queryArticles;
-
-        if (mCategory != null && mCategory.equalsIgnoreCase(HomeActivity.NO_MENU_ITEM_SELECTED))
+        if (mCategory != null)
         {
-            queryArticles = mDatabaseReference.orderByChild(QUERY_ALL_ARTICLES).startAt(0).endAt(Long.MAX_VALUE);
-            queryArticles.addValueEventListener(this);
-            mTitle = getString(R.string.home);
+            if (mCategory.equalsIgnoreCase(HomeActivity.NO_MENU_ITEM_SELECTED))
+            {
+                queryArticles = mDatabaseReference.orderByChild(QUERY_BY_AUTHOR_ID).limitToFirst(100);
+                queryArticles.addValueEventListener(this);
+                mTitle = getString(R.string.home);
+            }
+            else
+            {
+                queryArticles = mDatabaseReference.orderByChild(QUERY_BY_CATEGORY).equalTo(mCategory);
+                queryArticles.addValueEventListener(this);
+                mTitle = mCategory;
+            }
         }
-        Log.d(TAG, "onCreate: tag: " + mCategory);
     }
-
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
     {
-        /*THIS BELOW SECTION IS FOR TESTING PURPOSES ALONE*/
-
-//        Query queryArticles;
-//        Log.d(TAG, "onCreateView: Hello From Testing Section ");
-//        Log.d(TAG, "onCreateView: category: " + mCategory);
-//        queryArticles = mDatabaseReference.orderByChild(QUERY_BY_CATEGORY).equalTo(mCategory);
-//        queryArticles.addValueEventListener(this);
-//        Log.d(TAG, "onCreateView: testQuery: " + queryArticles);
-        /*THIS ABOVE SECTION IS FOR TESTING ALONE*/
-
-        Log.d(TAG, "onCreateView: starts");
-
-
         RecyclerView recyclerView = (RecyclerView) inflater.inflate(R.layout.recycler_view, container, false);
         recyclerView.setHasFixedSize(true);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, true);
-        linearLayoutManager.setStackFromEnd(true);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
         recyclerView.setLayoutManager(linearLayoutManager);
-        mRecyclerViewAdapter = new RecyclerViewAdapter(new ArrayList<Article>(), getContext());
-        recyclerView.setAdapter(mRecyclerViewAdapter);
+
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(), linearLayoutManager.getOrientation());
+        recyclerView.addItemDecoration(dividerItemDecoration);
+
+        mLatestViewAdapter = new LatestViewRecyclerAdapter(new ArrayList<Article>(), getContext());
+        recyclerView.setAdapter(mLatestViewAdapter);
 
         return recyclerView;
+
     }
 
     @Override
@@ -126,55 +126,12 @@ public class FeaturedFragment extends Fragment implements ValueEventListener
             Log.d(TAG, "onDataChange: We should be adding to the list by now ");
             articleArrayList.add(article);
         }
-        mRecyclerViewAdapter.loadArticleData(articleArrayList);
+        mLatestViewAdapter.loadArticleData(articleArrayList);
     }
 
     @Override
     public void onCancelled(DatabaseError databaseError)
     {
 
-    }
-
-    @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState)
-    {
-        super.onViewCreated(view, savedInstanceState);
-        getActivity().setTitle(mTitle);
-    }
-
-
-    @Override
-    public void onStart()
-    {
-        super.onStart();
-        Log.d(TAG, "onStart: called");
-    }
-
-    @Override
-    public void onStop()
-    {
-        super.onStop();
-        Log.d(TAG, "onStop: called");
-    }
-
-    @Override
-    public void onResume()
-    {
-        super.onResume();
-        Log.d(TAG, "onResume: called");
-    }
-
-    @Override
-    public void onPause()
-    {
-        super.onPause();
-        Log.d(TAG, "onPause: called");
-    }
-
-    @Override
-    public void onDestroy()
-    {
-        super.onDestroy();
-        Log.d(TAG, "onDestroy: destroyed called");
     }
 }

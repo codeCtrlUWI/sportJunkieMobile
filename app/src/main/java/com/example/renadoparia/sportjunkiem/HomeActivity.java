@@ -130,9 +130,11 @@ public class HomeActivity extends AppCompatActivity
     {
         Bundle bundle = new Bundle();
         Fragment fragment = new FeaturedFragment();
+        Fragment latestFragos = new LatestContentFragment();
         bundle.putString(KEY, NO_MENU_ITEM_SELECTED);
         fragment.setArguments(bundle);
-        setUpViewPager(viewPager, fragment);
+        latestFragos.setArguments(bundle);
+        setUpViewPager(viewPager, fragment, latestFragos);
     }
 
     private void initGoogleStuff()
@@ -172,6 +174,7 @@ public class HomeActivity extends AppCompatActivity
     {
         final ViewPager viewPager = (ViewPager) findViewById(R.id.viewPager);
         Fragment categoryFragment;
+        Fragment latestContentFragment;
         Bundle bundle = new Bundle();
         switch (id)
         {
@@ -180,33 +183,45 @@ public class HomeActivity extends AppCompatActivity
             case R.id.home:
                 menuState = id;
                 categoryFragment = new FeaturedFragment();
+                latestContentFragment = new LatestContentFragment();
                 bundle.putString(KEY, NO_MENU_ITEM_SELECTED);
                 categoryFragment.setArguments(bundle);
-                setUpViewPager(viewPager, categoryFragment);
+                latestContentFragment.setArguments(bundle);
+                setUpViewPager(viewPager, categoryFragment, latestContentFragment);
                 break;
             case R.id.foosball:
                 categoryFragment = new FeaturedCategoryFragment();
+                latestContentFragment = new LatestContentFragment();
                 bundle.putString(KEY, FOOTBALL_TAG);
                 categoryFragment.setArguments(bundle);
-                setUpViewPager(viewPager, categoryFragment);
+                latestContentFragment.setArguments(bundle);
+                setUpViewPager(viewPager, categoryFragment, latestContentFragment);
                 menuState = id;
                 break;
             case R.id.cricket:
                 menuState = id;
                 categoryFragment = new FeaturedCategoryFragment();
+                latestContentFragment = new LatestContentFragment();
                 bundle.putString(KEY, CRICKET_TAG);
                 categoryFragment.setArguments(bundle);
-                setUpViewPager(viewPager, categoryFragment);
+                latestContentFragment.setArguments(bundle);
+                setUpViewPager(viewPager, categoryFragment, latestContentFragment);
                 break;
             case R.id.Swimming:
                 categoryFragment = new FeaturedCategoryFragment();
+                latestContentFragment = new LatestContentFragment();
                 bundle.putString(KEY, SWIMMING_TAG);
                 categoryFragment.setArguments(bundle);
-                setUpViewPager(viewPager, categoryFragment);
+                latestContentFragment.setArguments(bundle);
+                setUpViewPager(viewPager, categoryFragment, latestContentFragment);
                 menuState = id;
                 break;
             case R.id.loggo:
                 signOut();
+                break;
+            case R.id.prof:
+                Intent profileActivityIntent = new Intent(getApplicationContext(), ProfileActivity.class);
+                startActivity(profileActivityIntent);
                 break;
             default:
                 menuState = R.id.home;
@@ -323,10 +338,11 @@ public class HomeActivity extends AppCompatActivity
 //        viewPager.setAdapter(adapter);
 //    }
 
-    private void setUpViewPager(ViewPager viewPager, Fragment fragment)
+    private void setUpViewPager(ViewPager viewPager, Fragment fragment, Fragment latestFragment)
     {
         Adapter adapter = new Adapter(getSupportFragmentManager());
         adapter.addFragment(fragment, "Featured");
+        adapter.addFragment(latestFragment, "Latest");
         viewPager.setAdapter(adapter);
     }
 

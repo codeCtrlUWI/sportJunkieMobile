@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?android:attr/selectableItemBackground"
+                android:padding="8dp">
+
+    <ImageView
+        android:id="@+id/smol_sport_picture"
+        android:layout_width="@dimen/avator_size"
+        android:layout_height="@dimen/avator_size"
+        android:background="@drawable/a"
+        android:scaleType="centerCrop"/>
+
+    <TextView
+        android:id="@+id/article_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/md_keylines"
+        android:layout_marginStart="@dimen/md_keylines"
+        android:layout_toEndOf="@id/smol_sport_picture"
+        android:layout_toRightOf="@+id/smol_sport_picture"
+        android:ellipsize="end"
+        android:maxLines="2"
+        android:textAppearance="?attr/textAppearanceListItem"
+        android:textColor="@color/colorPrimaryText"
+        android:textSize="@dimen/article_subheading"
+        tools:text="Title"/>
+
+    <TextView
+        android:id="@+id/time_date_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/article_title"
+        android:layout_marginLeft="@dimen/md_keylines"
+        android:layout_toRightOf="@+id/smol_sport_picture"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textAppearance="?attr/textAppearanceListItem"
+        android:textColor="@color/colorSecondaryText"
+        android:textSize="@dimen/list_body"
+        tools:text="Time or Date"/>
+
+</RelativeLayout>

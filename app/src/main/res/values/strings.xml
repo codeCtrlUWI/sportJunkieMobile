@@ -32,4 +32,8 @@
     <string name="article_photos">Article Photos</string>
     <string name="you_may_also_like">You May Also Like</string>
     <string name="also_from_this_author">Also From This Author</string>
+    <string name="title_activity_profile">ProfileActivity</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
 </resources>
