@@ -75,8 +75,6 @@ public class LandingActivity extends AppCompatActivity implements
                     //TODO:Add Redirection
                     Intent tempIntent = new Intent(getApplicationContext(), HomeActivity.class);
                     startActivity(tempIntent);
-
-                    Toast.makeText(getApplicationContext(), "Name: " + user.getDisplayName(), Toast.LENGTH_LONG).show();
                     Log.d(TAG, "onAuthStateChanged: User is Signed In: " + user.getEmail());
                     Log.d(TAG, "onAuthStateChanged: Name " + user.getDisplayName());
                 }
@@ -227,7 +225,7 @@ public class LandingActivity extends AppCompatActivity implements
                                     task.getResult().getUser().getUid(),
                                     task.getResult().getUser().getPhotoUrl().toString());
 
-                            mDatabaseReference.child(googleSignInAccount.getId()).setValue(googleUser);
+                            mDatabaseReference.child(task.getResult().getUser().getUid()).setValue(googleUser);
                             Log.d(TAG, "onComplete: signed in complete ");
                             Log.d(TAG, "onComplete: Name: " + task.getResult().getUser().getDisplayName());
                             Log.d(TAG, "onComplete: Email:" + task.getResult().getUser().getEmail());

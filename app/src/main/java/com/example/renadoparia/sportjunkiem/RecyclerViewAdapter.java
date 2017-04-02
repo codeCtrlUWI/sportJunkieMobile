@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -14,10 +15,13 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.MutableData;
 import com.google.firebase.database.Transaction;
+import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -29,6 +33,9 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Artic
     private static final String TAG = "RecyclerViewAdapter";
     private List<Article> mArticleList;
     private Context mContext;
+
+
+    private ImageButton favButton;
 
     private DatabaseReference mDatabaseReference;
 
@@ -49,7 +56,6 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Artic
     @Override
     public void onBindViewHolder(ArticleViewHolder holder, int position)
     {
-        // Log.d(TAG, "onBindViewHolder: called: ");
         final Article actualArticle = mArticleList.get(position);
         holder.mCategory.setText(actualArticle.getCategory());
         holder.mTitle.setText(actualArticle.getTitle());
@@ -88,7 +94,107 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Artic
                 goToActualArticle(actualArticle);
             }
         });
+
+        favButton = (ImageButton) holder.itemView.findViewById(R.id.favorite_button);
+        favButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                //updateFavorites(actualArticle);
+                updateFav(actualArticle.getArticleID());
+
+            }
+        });
     }
+
+    private void updateFav(final String articleID)
+    {
+        final DatabaseReference test = FirebaseDatabase.getInstance().getReference()
+                .child("USERS")
+                .child("nyrS4XcuhTfTb2y9AhJEtJaElkH3")
+                .child("favorites");
+        test.addListenerForSingleValueEvent(new ValueEventListener()
+        {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot)
+            {
+                Log.d(TAG, "onDataChange: " + dataSnapshot.toString());
+                GenericTypeIndicator<ArrayList<String>> arrayListGenericTypeIndicator
+                        = new GenericTypeIndicator<ArrayList<String>>()
+                {
+                };
+                if (dataSnapshot.getValue() == null)
+                {
+                    ArrayList<String> oneTimeInit = new ArrayList<>();
+                    oneTimeInit.add(articleID);
+                    test.setValue(oneTimeInit);
+                }
+                else if (dataSnapshot.getValue() != null)
+                {
+                    ArrayList<String> listOfFavorites = dataSnapshot.getValue(arrayListGenericTypeIndicator);
+
+                    if (listOfFavorites.contains(articleID))
+                    {
+                        listOfFavorites.remove(articleID);
+                        test.setValue(listOfFavorites);
+                    }
+                    else if (!listOfFavorites.contains(articleID))
+                    {
+                        listOfFavorites.add(articleID);
+                        test.setValue(listOfFavorites);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError)
+            {
+
+            }
+        });
+
+    }
+
+//    private void updateFavorites(final Article actualArticle)
+//    {
+////      http://stackoverflow.com/a/40251242
+//        final DatabaseReference test = FirebaseDatabase.getInstance().getReference()
+//                .child("USERS")
+//                .child("nyrS4XcuhTfTb2y9AhJEtJaElkH3")
+//                .child("favorites");
+//
+//        test.runTransaction(new Transaction.Handler()
+//        {
+//            @Override
+//            public Transaction.Result doTransaction(MutableData mutableData)
+//            {
+//                Log.d(TAG, "doTransaction: data: " + mutableData.toString());
+//                GenericTypeIndicator<ArrayList<String>> arrayListGenericTypeIndicator
+//                        = new GenericTypeIndicator<ArrayList<String>>()
+//                {
+//                };
+//                ArrayList<String> listOfFavorites = mutableData.getValue(arrayListGenericTypeIndicator);
+//                if (listOfFavorites.contains(actualArticle.getArticleID()))
+//                {
+//                    listOfFavorites.remove(actualArticle.getArticleID());
+//                    mutableData.setValue(listOfFavorites);
+//                }
+//                else
+//                {
+//                    listOfFavorites.add(actualArticle.getArticleID());
+//                    mutableData.setValue(listOfFavorites);
+//                }
+//                return Transaction.success(mutableData);
+//            }
+//
+//            @Override
+//            public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot)
+//            {
+//                Log.d(TAG, "onComplete: " + dataSnapshot.toString());
+//            }
+//        });
+//    }
 
     //    http://stackoverflow.com/questions/4197135/how-to-start-activity-in-adapter
     private void sharedIntent(Article actualArticle)
@@ -130,8 +236,6 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Artic
             }
         });
         Log.d(TAG, "updateArticleClicks: " + mDatabaseReference.toString());
-
-
     }
 
     private void goToActualArticle(Article article)
@@ -161,18 +265,6 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Artic
         mArticleList = articleList;
         notifyDataSetChanged();
         //Log.d(TAG, "loadArticleData: load Article Ended: ");
-    }
-
-    public Article getArticle(int position)
-    {
-        if ((mArticleList != null) && (mArticleList.size() != 0))
-        {
-            return mArticleList.get(position);
-        }
-        else
-        {
-            return null;
-        }
     }
 
     static class ArticleViewHolder extends RecyclerView.ViewHolder

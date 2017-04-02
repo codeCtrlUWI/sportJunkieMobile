@@ -54,7 +54,7 @@
             android:ellipsize="end"
             android:maxLines="1"
             android:textColor="@color/colorPrimaryText"
-            android:textSize="@dimen/article_subheading"
+            android:textSize="18sp"
             android:textStyle="bold"
             tools:text="Title"/>
 
@@ -80,6 +80,18 @@
             android:contentDescription="@string/share_button"
             android:tint="@color/button_grey"
             app:srcCompat="@drawable/ic_share_black_24dp"/>
+
+        <ImageButton
+            android:id="@+id/favorite_button"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="@dimen/cards_button_width"
+            android:layout_height="@dimen/cards_button_height"
+            android:layout_below="@+id/card_title"
+            android:layout_marginRight="@dimen/md_keylines"
+            android:layout_toLeftOf="@id/share_button"
+            android:tint="@color/button_grey"
+            app:srcCompat="@drawable/ic_favorite_black_24dp"/>
+
 
     </RelativeLayout>
 

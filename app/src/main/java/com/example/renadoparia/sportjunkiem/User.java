@@ -1,5 +1,7 @@
 package com.example.renadoparia.sportjunkiem;
 
+import java.util.ArrayList;
+
 /**
  * Created by Renado_Paria on 2/26/2017 at 11:42 PM.
  */
@@ -13,6 +15,7 @@ class User
     private String mProfilePicURL;
     private Boolean isAuthor;
 
+
     public User(String firstName, String lastName, String email, String UID, String profilePicURL)
     {
         mFirstName = firstName;
@@ -21,6 +24,8 @@ class User
         mUID = UID;
         mProfilePicURL = profilePicURL;
         isAuthor = false;
+        ArrayList<String> mFavorites = new ArrayList<>();
+        mFavorites.add(0, "init");
     }
 
     public Boolean getAuthor()
