@@ -1,7 +1,5 @@
 package com.example.renadoparia.sportjunkiem;
 
-import java.util.List;
-
 /**
  * Created by Renado_Paria on 3/6/2017 at 9:11 PM.
  */
@@ -20,15 +18,13 @@ class Article
     private String mLastUpdated;
     private String mUrlToImage;
     private long mNumberOfClicks;
-    private List<String> mGalleryImages;
+    private String mGalleryID;
 
     public Article()
     {
     }
 
-    //private String mLinkToArticle;
-    /*This may be added, for sharing purposes later on, if it is added, remember to remake constructors accordingly*/
-    public Article(String articleID, String authorUID, String authorFname, String authorLname, String title, String subtitle, String articleData, String category, long timeAndDateCreated, String lastUpdated, String urlToImage, long numberOfClicks, List<String> galleryImages)
+    public Article(String articleID, String authorUID, String authorFname, String authorLname, String title, String subtitle, String articleData, String category, long timeAndDateCreated, String lastUpdated, String urlToImage, long numberOfClicks, String galleryID)
     {
         mArticleID = articleID;
         mAuthorUID = authorUID;
@@ -42,10 +38,27 @@ class Article
         mLastUpdated = lastUpdated;
         mUrlToImage = urlToImage;
         mNumberOfClicks = numberOfClicks;
-        mGalleryImages = galleryImages;
+        mGalleryID = galleryID;
     }
 
-    public Article(String articleID, String authorUID, String authorFname, String authorLname, String title, String subtitle, String articleData, String category, long timeAndDateCreated, String lastUpdated, String urlToImage, List<String> galleryImages)
+    public Article(String articleID, String authorUID, String authorFname, String authorLname, String title, String subtitle, String articleData, String category, long timeAndDateCreated, String lastUpdated, String urlToImage, long numberOfClicks)
+    {
+        mArticleID = articleID;
+        mAuthorUID = authorUID;
+        mAuthorFname = authorFname;
+        mAuthorLname = authorLname;
+        mTitle = title;
+        mSubtitle = subtitle;
+        mArticleData = articleData;
+        mCategory = category;
+        mTimeAndDateCreated = timeAndDateCreated;
+        mLastUpdated = lastUpdated;
+        mUrlToImage = urlToImage;
+        mNumberOfClicks = numberOfClicks;
+        mGalleryID = null;
+    }
+
+    public Article(String articleID, String authorUID, String authorFname, String authorLname, String title, String subtitle, String articleData, String category, long timeAndDateCreated, String lastUpdated, String urlToImage)
     {
         mArticleID = articleID;
         mAuthorUID = authorUID;
@@ -59,11 +72,10 @@ class Article
         mLastUpdated = lastUpdated;
         mUrlToImage = urlToImage;
         mNumberOfClicks = 0;
-        mGalleryImages = galleryImages;
+        mGalleryID = null;
     }
 
-    public Article
-            (String articleID, String authorUID, String authorFname, String authorLname, String title, String subtitle, String articleData, String category, long timeAndDateCreated, String lastUpdated, String urlToImage, long numberOfClicks)
+    public Article(String articleID, String authorUID, String authorFname, String authorLname, String title, String subtitle, String articleData, String category, long timeAndDateCreated, String lastUpdated, long numberOfClicks, String galleryID)
     {
         mArticleID = articleID;
         mAuthorUID = authorUID;
@@ -75,12 +87,12 @@ class Article
         mCategory = category;
         mTimeAndDateCreated = timeAndDateCreated;
         mLastUpdated = lastUpdated;
-        mUrlToImage = urlToImage;
+        mUrlToImage = null;
         mNumberOfClicks = numberOfClicks;
-        mGalleryImages = null;
+        mGalleryID = galleryID;
     }
 
-    public String getArticleID()
+    String getArticleID()
     {
         return mArticleID;
     }
@@ -200,14 +212,14 @@ class Article
         mNumberOfClicks = numberOfClicks;
     }
 
-    public List<String> getGalleryImages()
+    public String getGalleryID()
     {
-        return mGalleryImages;
+        return mGalleryID;
     }
 
-    public void setGalleryImages(List<String> galleryImages)
+    public void setGalleryID(String galleryID)
     {
-        mGalleryImages = galleryImages;
+        mGalleryID = galleryID;
     }
 
     @Override
@@ -226,7 +238,7 @@ class Article
                 "\"mLastUpdated\":\"" + mLastUpdated + "\"," +
                 "\"mUrlToImage\":\"" + mUrlToImage + "\"," +
                 "\"mNumberOfClicks\":\"" + mNumberOfClicks + "\"," +
-                "\"mGalleryImages\":\"" + mGalleryImages + "\"" + '}';
+                "\"mGalleryID\":\"" + mGalleryID + "\"" + '}';
     }
 }
 

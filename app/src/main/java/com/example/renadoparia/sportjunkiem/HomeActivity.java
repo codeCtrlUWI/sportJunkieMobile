@@ -27,8 +27,6 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -126,26 +124,6 @@ public class HomeActivity extends AppCompatActivity
                 }
             }
         };
-    }
-
-    private void initUserFavorites()
-    {
-        final String USERS_BRANCH = "USERS";
-        final String FAVORITES_BRANCH = "favorites";
-        final String INIT_INDEX = "0";
-        final String INIT_VALUE = "init";
-
-        Log.d(TAG, "initUserFavorites: called");
-        FirebaseUser user = mAuth.getCurrentUser();
-        String id = user.getUid();
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance()
-                .getReference()
-                .child(USERS_BRANCH)
-                .child(id)
-                .child(FAVORITES_BRANCH)
-                .child(INIT_INDEX);
-        databaseReference.setValue(INIT_VALUE);
-
     }
 
     private void loadHome(ViewPager viewPager)
@@ -251,7 +229,6 @@ public class HomeActivity extends AppCompatActivity
         if (mDrawerLayout.isDrawerOpen(GravityCompat.START))
         {
             mDrawerLayout.closeDrawer(GravityCompat.START);
-
         }
     }
 
@@ -393,7 +370,6 @@ public class HomeActivity extends AppCompatActivity
     {
         super.onResume();
         Log.d(TAG, "onResume: called");
-        // initUserFavorites();
     }
 
     @Override
@@ -404,8 +380,5 @@ public class HomeActivity extends AppCompatActivity
     }
 
 
-    private void STRICTLY_A_TEST_QUERY()
-    {
 
-    }
 }

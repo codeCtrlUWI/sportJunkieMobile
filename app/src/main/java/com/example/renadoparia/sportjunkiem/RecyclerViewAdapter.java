@@ -48,7 +48,6 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Artic
     @Override
     public ArticleViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
     {
-        //Log.d(TAG, "onCreateViewHolder: new View");
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_view, parent, false);
         return new ArticleViewHolder(view);
     }
@@ -156,46 +155,6 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Artic
 
     }
 
-//    private void updateFavorites(final Article actualArticle)
-//    {
-////      http://stackoverflow.com/a/40251242
-//        final DatabaseReference test = FirebaseDatabase.getInstance().getReference()
-//                .child("USERS")
-//                .child("nyrS4XcuhTfTb2y9AhJEtJaElkH3")
-//                .child("favorites");
-//
-//        test.runTransaction(new Transaction.Handler()
-//        {
-//            @Override
-//            public Transaction.Result doTransaction(MutableData mutableData)
-//            {
-//                Log.d(TAG, "doTransaction: data: " + mutableData.toString());
-//                GenericTypeIndicator<ArrayList<String>> arrayListGenericTypeIndicator
-//                        = new GenericTypeIndicator<ArrayList<String>>()
-//                {
-//                };
-//                ArrayList<String> listOfFavorites = mutableData.getValue(arrayListGenericTypeIndicator);
-//                if (listOfFavorites.contains(actualArticle.getArticleID()))
-//                {
-//                    listOfFavorites.remove(actualArticle.getArticleID());
-//                    mutableData.setValue(listOfFavorites);
-//                }
-//                else
-//                {
-//                    listOfFavorites.add(actualArticle.getArticleID());
-//                    mutableData.setValue(listOfFavorites);
-//                }
-//                return Transaction.success(mutableData);
-//            }
-//
-//            @Override
-//            public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot)
-//            {
-//                Log.d(TAG, "onComplete: " + dataSnapshot.toString());
-//            }
-//        });
-//    }
-
     //    http://stackoverflow.com/questions/4197135/how-to-start-activity-in-adapter
     private void sharedIntent(Article actualArticle)
     {
@@ -281,5 +240,46 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Artic
             mTitle = (TextView) itemView.findViewById(R.id.card_title);
         }
     }
+
+
+//    private void updateFavorites(final Article actualArticle)
+//    {
+////      http://stackoverflow.com/a/40251242
+//        final DatabaseReference test = FirebaseDatabase.getInstance().getReference()
+//                .child("USERS")
+//                .child("nyrS4XcuhTfTb2y9AhJEtJaElkH3")
+//                .child("favorites");
+//
+//        test.runTransaction(new Transaction.Handler()
+//        {
+//            @Override
+//            public Transaction.Result doTransaction(MutableData mutableData)
+//            {
+//                Log.d(TAG, "doTransaction: data: " + mutableData.toString());
+//                GenericTypeIndicator<ArrayList<String>> arrayListGenericTypeIndicator
+//                        = new GenericTypeIndicator<ArrayList<String>>()
+//                {
+//                };
+//                ArrayList<String> listOfFavorites = mutableData.getValue(arrayListGenericTypeIndicator);
+//                if (listOfFavorites.contains(actualArticle.getArticleID()))
+//                {
+//                    listOfFavorites.remove(actualArticle.getArticleID());
+//                    mutableData.setValue(listOfFavorites);
+//                }
+//                else
+//                {
+//                    listOfFavorites.add(actualArticle.getArticleID());
+//                    mutableData.setValue(listOfFavorites);
+//                }
+//                return Transaction.success(mutableData);
+//            }
+//
+//            @Override
+//            public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot)
+//            {
+//                Log.d(TAG, "onComplete: " + dataSnapshot.toString());
+//            }
+//        });
+//    }
 }
 

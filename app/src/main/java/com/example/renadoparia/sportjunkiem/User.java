@@ -14,6 +14,7 @@ class User
     private String mUID;
     private String mProfilePicURL;
     private Boolean isAuthor;
+    private ArrayList<String> mFavorites;
 
 
     public User(String firstName, String lastName, String email, String UID, String profilePicURL)
@@ -24,8 +25,24 @@ class User
         mUID = UID;
         mProfilePicURL = profilePicURL;
         isAuthor = false;
-        ArrayList<String> mFavorites = new ArrayList<>();
-        mFavorites.add(0, "init");
+        mFavorites = null;
+    }
+
+    public User(String firstName,
+                String lastName,
+                String email,
+                String UID,
+                String profilePicURL,
+                Boolean isAuthor,
+                ArrayList<String> favorites)
+    {
+        mFirstName = firstName;
+        mLastName = lastName;
+        mEmail = email;
+        mUID = UID;
+        mProfilePicURL = profilePicURL;
+        this.isAuthor = isAuthor;
+        mFavorites = favorites;
     }
 
     public Boolean getAuthor()
@@ -90,5 +107,19 @@ class User
     public void setUID(String UID)
     {
         mUID = UID;
+    }
+
+    @Override
+    public String toString()
+    {
+        return "User{" +
+                "mFirstName='" + mFirstName + '\'' +
+                ", mLastName='" + mLastName + '\'' +
+                ", mEmail='" + mEmail + '\'' +
+                ", mUID='" + mUID + '\'' +
+                ", mProfilePicURL='" + mProfilePicURL + '\'' +
+                ", isAuthor=" + isAuthor +
+                ", mFavorites=" + mFavorites +
+                '}';
     }
 }
