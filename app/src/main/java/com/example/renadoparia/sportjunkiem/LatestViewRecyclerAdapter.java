@@ -40,10 +40,8 @@ class LatestViewRecyclerAdapter extends RecyclerView.Adapter<LatestViewRecyclerA
 
         Article actualArticle = mArticlesList.get(position);
 
-        Long timeAndDate = actualArticle.getTimeAndDateCreated();
-        String timeAndDateString = timeAndDate.toString();
-
-        holder.mTitle.setText((String) actualArticle.getTitle());
+        String timeAndDateString = actualArticle.getTimeAndDateCreated();
+        holder.mTitle.setText(actualArticle.getTitle());
         holder.mDateView.setText(timeAndDateString);
         Picasso.with(mContext)
                 .load(actualArticle.getUrlToImage())
@@ -68,6 +66,11 @@ class LatestViewRecyclerAdapter extends RecyclerView.Adapter<LatestViewRecyclerA
     {
         mArticlesList = data;
         notifyDataSetChanged();
+    }
+
+    public Article getArticle(int position)
+    {
+        return ((mArticlesList != null) && (mArticlesList.size() != 0) ? mArticlesList.get(position) : null);
     }
 
     static class ListViewHolder extends RecyclerView.ViewHolder

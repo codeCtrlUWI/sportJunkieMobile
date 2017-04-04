@@ -11,6 +11,8 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -31,13 +33,17 @@ import java.util.List;
 class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ArticleViewHolder>
 {
     private static final String TAG = "RecyclerViewAdapter";
+    private static final String FAVORITES_REF = "favorites";
+    private static final String USERS_REF = "USERS";
     private List<Article> mArticleList;
     private Context mContext;
+    private FirebaseAuth mAuth;
 
 
     private ImageButton favButton;
 
     private DatabaseReference mDatabaseReference;
+
 
     public RecyclerViewAdapter(List<Article> articleList, Context context)
     {
@@ -52,6 +58,7 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Artic
         return new ArticleViewHolder(view);
     }
 
+
     @Override
     public void onBindViewHolder(ArticleViewHolder holder, int position)
     {
@@ -63,7 +70,7 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Artic
                 .error(R.drawable.ic_image_black_48dp)
                 .into(holder.mSportPicture);
 
-        holder.itemView.setOnClickListener(new View.OnClickListener()    //TODO:Implement Call Backs To Clean Up OnBindViewHolder Code
+        holder.itemView.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
@@ -109,10 +116,13 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Artic
 
     private void updateFav(final String articleID)
     {
+        mAuth = FirebaseAuth.getInstance();
+        FirebaseUser firebaseUser = mAuth.getCurrentUser();
+        String UIDOfCurrentUser = firebaseUser != null ? firebaseUser.getUid() : null;
         final DatabaseReference test = FirebaseDatabase.getInstance().getReference()
-                .child("USERS")
-                .child("nyrS4XcuhTfTb2y9AhJEtJaElkH3")
-                .child("favorites");
+                .child(USERS_REF)
+                .child(UIDOfCurrentUser)
+                .child(FAVORITES_REF);
         test.addListenerForSingleValueEvent(new ValueEventListener()
         {
             @Override
@@ -155,7 +165,7 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Artic
 
     }
 
-    //    http://stackoverflow.com/questions/4197135/how-to-start-activity-in-adapter
+    //http://stackoverflow.com/questions/4197135/how-to-start-activity-in-adapter
     private void sharedIntent(Article actualArticle)
     {
         Intent shareIntent = new Intent();
@@ -218,12 +228,15 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Artic
         }
     }
 
+    Article getArticle(int position)
+    {
+        return ((mArticleList != null) && (mArticleList.size() != 0) ? mArticleList.get(position) : null);
+    }
+
     void loadArticleData(List<Article> articleList)
     {
-        // Log.d(TAG, "loadArticleData: load Article Called " + articleList.toString());
         mArticleList = articleList;
         notifyDataSetChanged();
-        //Log.d(TAG, "loadArticleData: load Article Ended: ");
     }
 
     static class ArticleViewHolder extends RecyclerView.ViewHolder
@@ -240,46 +253,5 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Artic
             mTitle = (TextView) itemView.findViewById(R.id.card_title);
         }
     }
-
-
-//    private void updateFavorites(final Article actualArticle)
-//    {
-////      http://stackoverflow.com/a/40251242
-//        final DatabaseReference test = FirebaseDatabase.getInstance().getReference()
-//                .child("USERS")
-//                .child("nyrS4XcuhTfTb2y9AhJEtJaElkH3")
-//                .child("favorites");
-//
-//        test.runTransaction(new Transaction.Handler()
-//        {
-//            @Override
-//            public Transaction.Result doTransaction(MutableData mutableData)
-//            {
-//                Log.d(TAG, "doTransaction: data: " + mutableData.toString());
-//                GenericTypeIndicator<ArrayList<String>> arrayListGenericTypeIndicator
-//                        = new GenericTypeIndicator<ArrayList<String>>()
-//                {
-//                };
-//                ArrayList<String> listOfFavorites = mutableData.getValue(arrayListGenericTypeIndicator);
-//                if (listOfFavorites.contains(actualArticle.getArticleID()))
-//                {
-//                    listOfFavorites.remove(actualArticle.getArticleID());
-//                    mutableData.setValue(listOfFavorites);
-//                }
-//                else
-//                {
-//                    listOfFavorites.add(actualArticle.getArticleID());
-//                    mutableData.setValue(listOfFavorites);
-//                }
-//                return Transaction.success(mutableData);
-//            }
-//
-//            @Override
-//            public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot)
-//            {
-//                Log.d(TAG, "onComplete: " + dataSnapshot.toString());
-//            }
-//        });
-//    }
 }
 

@@ -24,16 +24,14 @@ class RecyclerItemClicker extends RecyclerView.SimpleOnItemTouchListener
         mGestureDetector = new GestureDetectorCompat(context, new GestureDetector.SimpleOnGestureListener()
         {
             @Override
-            public boolean onSingleTapUp(MotionEvent e)
+            public boolean onDoubleTap(MotionEvent e)
             {
-                Log.d(TAG, "onSingleTapUp: starts");
                 View childView = recyclerView.findChildViewUnder(e.getX(), e.getY());
                 if (childView != null && mListener != null)
                 {
-                    Log.d(TAG, "onSingleTapUp: calling listener.onItemClick");
-                    mListener.onItemClick(childView, recyclerView.getChildAdapterPosition(childView));
+                    Log.d(TAG, "onDoubleTap: calling on Item Double Tap");
+                    mListener.onItemDoubleTap(childView, recyclerView.getChildAdapterPosition(childView));
                 }
-
                 return true;
             }
 
@@ -47,6 +45,19 @@ class RecyclerItemClicker extends RecyclerView.SimpleOnItemTouchListener
                     Log.d(TAG, "onLongPress: calling listener.onItemLongClick");
                     mListener.onItemLongClick(childView, recyclerView.getChildAdapterPosition(childView));
                 }
+            }
+
+            @Override
+            public boolean onSingleTapConfirmed(MotionEvent e)
+            {
+                Log.d(TAG, "onSingleTapUp: starts");
+                View childView = recyclerView.findChildViewUnder(e.getX(), e.getY());
+                if (childView != null && mListener != null)
+                {
+                    Log.d(TAG, "onSingleTapConfirmed: calling on itemclick");
+                    mListener.onItemClick(childView, recyclerView.getChildAdapterPosition(childView));
+                }
+                return true;
             }
         });
     }

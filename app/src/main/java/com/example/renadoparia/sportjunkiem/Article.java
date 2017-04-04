@@ -14,7 +14,7 @@ class Article
     private String mSubtitle;
     private String mArticleData;
     private String mCategory;
-    private long mTimeAndDateCreated;
+    private String mTimeAndDateCreated;
     private String mLastUpdated;
     private String mUrlToImage;
     private long mNumberOfClicks;
@@ -24,7 +24,7 @@ class Article
     {
     }
 
-    public Article(String articleID, String authorUID, String authorFname, String authorLname, String title, String subtitle, String articleData, String category, long timeAndDateCreated, String lastUpdated, String urlToImage, long numberOfClicks, String galleryID)
+    public Article(String articleID, String authorUID, String authorFname, String authorLname, String title, String subtitle, String articleData, String category, String timeAndDateCreated, String lastUpdated, String urlToImage, long numberOfClicks, String galleryID)
     {
         mArticleID = articleID;
         mAuthorUID = authorUID;
@@ -41,7 +41,7 @@ class Article
         mGalleryID = galleryID;
     }
 
-    public Article(String articleID, String authorUID, String authorFname, String authorLname, String title, String subtitle, String articleData, String category, long timeAndDateCreated, String lastUpdated, String urlToImage, long numberOfClicks)
+    public Article(String articleID, String authorUID, String authorFname, String authorLname, String title, String subtitle, String articleData, String category, String timeAndDateCreated, String lastUpdated, String urlToImage, long numberOfClicks)
     {
         mArticleID = articleID;
         mAuthorUID = authorUID;
@@ -58,7 +58,7 @@ class Article
         mGalleryID = null;
     }
 
-    public Article(String articleID, String authorUID, String authorFname, String authorLname, String title, String subtitle, String articleData, String category, long timeAndDateCreated, String lastUpdated, String urlToImage)
+    public Article(String articleID, String authorUID, String authorFname, String authorLname, String title, String subtitle, String articleData, String category, String timeAndDateCreated, String lastUpdated, String urlToImage)
     {
         mArticleID = articleID;
         mAuthorUID = authorUID;
@@ -75,7 +75,7 @@ class Article
         mGalleryID = null;
     }
 
-    public Article(String articleID, String authorUID, String authorFname, String authorLname, String title, String subtitle, String articleData, String category, long timeAndDateCreated, String lastUpdated, long numberOfClicks, String galleryID)
+    public Article(String articleID, String authorUID, String authorFname, String authorLname, String title, String subtitle, String articleData, String category, String timeAndDateCreated, String lastUpdated, long numberOfClicks, String galleryID)
     {
         mArticleID = articleID;
         mAuthorUID = authorUID;
@@ -92,7 +92,7 @@ class Article
         mGalleryID = galleryID;
     }
 
-    String getArticleID()
+    public String getArticleID()
     {
         return mArticleID;
     }
@@ -172,12 +172,12 @@ class Article
         mCategory = category;
     }
 
-    public long getTimeAndDateCreated()
+    public String getTimeAndDateCreated()
     {
         return mTimeAndDateCreated;
     }
 
-    public void setTimeAndDateCreated(long timeAndDateCreated)
+    public void setTimeAndDateCreated(String timeAndDateCreated)
     {
         mTimeAndDateCreated = timeAndDateCreated;
     }

@@ -65,6 +65,11 @@ class RelatedArticlesRVAdapter extends RecyclerView.Adapter<RelatedArticlesRVAda
         notifyDataSetChanged();
     }
 
+    Article getArticle(int position)
+    {
+        return ((mArticleList != null) && (mArticleList.size() != 0) ? mArticleList.get(position) : null);
+    }
+
     static class RelatedArticleViewHolder extends RecyclerView.ViewHolder
     {
         ImageView mImageView;

@@ -65,6 +65,11 @@ class AuthorRelatedRVAdapter extends RecyclerView.Adapter<AuthorRelatedRVAdapter
         notifyDataSetChanged();
     }
 
+    Article getArticle(int position)
+    {
+        return ((mArticleList != null) && (mArticleList.size() != 0) ? mArticleList.get(position) : null);
+    }
+
     static class AuthorRelatedArticlesViewHolder extends RecyclerView.ViewHolder
     {
         ImageView mSportPicture;

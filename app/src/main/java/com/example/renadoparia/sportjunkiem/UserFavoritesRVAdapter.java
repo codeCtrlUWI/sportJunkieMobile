@@ -59,10 +59,21 @@ class UserFavoritesRVAdapter extends RecyclerView.Adapter<UserFavoritesRVAdapter
         }
     }
 
+    void clearData()
+    {
+        mArticleList.clear();
+        notifyDataSetChanged();
+    }
+
     void loadArticleData(List<Article> articleList)
     {
         mArticleList = articleList;
         notifyDataSetChanged();
+    }
+
+    Article getArticle(int position)
+    {
+        return ((mArticleList != null) && (mArticleList.size() != 0) ? mArticleList.get(position) : null);
     }
 
     static class GridViewHolder extends RecyclerView.ViewHolder

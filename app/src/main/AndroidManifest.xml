@@ -16,6 +16,8 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".LandingActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:screenOrientation="portrait"
             android:theme="@style/FullScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -25,18 +27,26 @@
         </activity>
         <activity
             android:name=".SignUpFormActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:screenOrientation="portrait"
             android:theme="@style/FullScreen">
         </activity>
         <activity
             android:name=".SignInEmailFormActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:screenOrientation="portrait"
             android:theme="@style/FullScreen">
         </activity>
         <activity
             android:name=".HomeActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:screenOrientation="portrait"
             android:theme="@style/FullScreen">
         </activity>
         <activity
             android:name=".ArticleDetailActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:screenOrientation="portrait"
             android:theme="@style/FullScreen">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -45,6 +55,8 @@
         </activity>
         <activity
             android:name=".ProfileActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:screenOrientation="portrait"
             android:theme="@style/FullScreen">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

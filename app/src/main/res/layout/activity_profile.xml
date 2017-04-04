@@ -99,11 +99,11 @@ at least, that's what I thought it was, cause when i tested it and changed it ba
                 android:id="@+id/profile_picture"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/profile_bar_height"
+                android:adjustViewBounds="true"
                 android:background="@drawable/a"
                 android:fitsSystemWindows="true"
-                android:scaleType="fitXY"
-                app:layout_collapseMode="parallax"
-                />
+                android:scaleType="centerCrop"
+                app:layout_collapseMode="parallax"/>
 
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar"
@@ -111,6 +111,13 @@ at least, that's what I thought it was, cause when i tested it and changed it ba
                 android:layout_height="?attr/actionBarSize"
                 app:layout_collapseMode="pin"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
+
+            <!--<TextView-->
+            <!--android:id="@+id/email"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="renadoparia@gmail.com"-->
+            <!--android:layout_gravity="bottom"/>-->
 
         </android.support.design.widget.CollapsingToolbarLayout>
 

@@ -80,41 +80,11 @@ public class FeaturedCategoryFragment extends Fragment implements ValueEventList
     public void onDataChange(DataSnapshot dataSnapshot)
     {
         ArrayList<Article> articleArrayList = new ArrayList<>();
-        Article article;
+        Article actualArticle;
         for (DataSnapshot snapData : dataSnapshot.getChildren())
         {
-            String authorUID = (String) snapData.child("authorUID").getValue();
-            String articleID = (String) snapData.child("articleID").getValue();
-            String authorFname = (String) snapData.child("authorFname").getValue();
-            String authorLname = (String) snapData.child("authorLname").getValue();
-
-            String category = (String) snapData.child("category").getValue();
-            String lastUpdated = (String) snapData.child("lastUpdated").getValue();
-            long numberOfClicks = (Long) snapData.child("numberOfClicks").getValue();
-            String subTitle = (String) snapData.child("subtitle").getValue();
-
-            long timeAndDateCreated = (Long) snapData.child("timeAndDateCreated").getValue();
-            String title = (String) snapData.child("title").getValue();
-            String urlToImage = (String) snapData.child("urlToImage").getValue();
-            String articleData = (String) snapData.child("articleData").getValue();
-
-            article =
-                    new Article
-                            (articleID,
-                                    authorUID,
-                                    authorFname,
-                                    authorLname,
-                                    title,
-                                    subTitle,
-                                    articleData,
-                                    category,
-                                    timeAndDateCreated,
-                                    lastUpdated,
-                                    urlToImage,
-                                    numberOfClicks);
-
-            Log.d(TAG, "onDataChange: We should be adding to the list by now ");
-            articleArrayList.add(article);
+            actualArticle = snapData.getValue(Article.class);
+            articleArrayList.add(actualArticle);
         }
         Collections.sort(articleArrayList, new Comparator<Article>()
         {

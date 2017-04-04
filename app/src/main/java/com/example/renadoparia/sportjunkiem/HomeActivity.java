@@ -124,6 +124,7 @@ public class HomeActivity extends AppCompatActivity
                 }
             }
         };
+
     }
 
     private void loadHome(ViewPager viewPager)
@@ -249,6 +250,10 @@ public class HomeActivity extends AppCompatActivity
         if (id == android.R.id.home)
         {
             mDrawerLayout.openDrawer(GravityCompat.START);
+        }
+        if (id == R.id.profile)
+        {
+            startActivity(new Intent(getApplicationContext(), ProfileActivity.class));
         }
         return super.onOptionsItemSelected(item);
 
@@ -378,7 +383,6 @@ public class HomeActivity extends AppCompatActivity
         super.onPause();
         Log.d(TAG, "onPause: called");
     }
-
 
 
 }

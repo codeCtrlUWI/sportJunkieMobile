@@ -1,5 +1,6 @@
 package com.example.renadoparia.sportjunkiem;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.ActionBar;
@@ -8,14 +9,20 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.GenericTypeIndicator;
+import com.google.firebase.database.MutableData;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
@@ -24,13 +31,15 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class ArticleDetailActivity extends AppCompatActivity
+public class ArticleDetailActivity extends AppCompatActivity implements OnRecyclerClickListener
 {
     private static final String TAG = "ArticleDetailActivity";
     private static final String KEY = "articledata";
     private static final String ARTICLE_REF = "ARTICLES";
     private static final String QUERY_BY_CATEGORY = "category";
     private static final String QUERY_BY_AUTHOR_ID = "authorUID";
+    private static final String USERS_REF = "USERS";
+    private static final String FAVORITES_REF = "favorites";
 
     private String mArticleId;
     private String mAuthorUID;
@@ -45,19 +54,21 @@ public class ArticleDetailActivity extends AppCompatActivity
     private String mUrlToImage;
 
     private CollapsingToolbarLayout mCollapsingToolbar;
+
     //    private ImageSwitcher mImageSwitcher;
     private TextView mTitleArticle;
     private TextView mSubTitleArticle;
     private TextView mActualArticle;
     private ImageView mCoverPhoto;
-    private RecyclerView mRecyclerView;
-    private RecyclerView mAuthorRelatedArticlesRecyclerView;
 
     private TextView mAuthorFullName;
     private TextView mDateView;
 
     private AuthorRelatedRVAdapter mAuthorRelatedRVAdapter;
     private RelatedArticlesRVAdapter mRelatedArticlesRVAdapter;
+
+    private FirebaseAuth mAuth;
+    private DatabaseReference mDatabaseReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -67,7 +78,7 @@ public class ArticleDetailActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 
         initWidgets();
-
+        mAuth = FirebaseAuth.getInstance();
 
         setSupportActionBar(toolbar);
         ActionBar supportActionBar = getSupportActionBar();
@@ -141,28 +152,30 @@ public class ArticleDetailActivity extends AppCompatActivity
 
     private void relatedArticlesRecyclerViewSetup()
     {
-        mRecyclerView = (RecyclerView) findViewById(R.id.related_articles);
-        mRecyclerView.setHasFixedSize(true);
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.related_articles);
+        recyclerView.setHasFixedSize(true);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false);
-        mRecyclerView.setLayoutManager(linearLayoutManager);
+        recyclerView.setLayoutManager(linearLayoutManager);
+        recyclerView.addOnItemTouchListener(new RecyclerItemClicker(getApplicationContext(), recyclerView, this));
         mRelatedArticlesRVAdapter = new RelatedArticlesRVAdapter(new ArrayList<Article>(), getApplicationContext());
-        mRecyclerView.setAdapter(mRelatedArticlesRVAdapter);
+        recyclerView.setAdapter(mRelatedArticlesRVAdapter);
     }
 
     private void authorRelatedArticlesRecyclerViewSetUp()
     {
-        mAuthorRelatedArticlesRecyclerView = (RecyclerView) findViewById(R.id.author_related_articles);
-        mAuthorRelatedArticlesRecyclerView.setHasFixedSize(true);
+        RecyclerView authorRelatedArticlesRecyclerView = (RecyclerView) findViewById(R.id.author_related_articles);
+        authorRelatedArticlesRecyclerView.setHasFixedSize(true);
         LinearLayoutManager linearLayoutManger = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.HORIZONTAL, false);
-        mAuthorRelatedArticlesRecyclerView.setLayoutManager(linearLayoutManger);
+        authorRelatedArticlesRecyclerView.setLayoutManager(linearLayoutManger);
+        authorRelatedArticlesRecyclerView.addOnItemTouchListener(new RecyclerItemClicker(getApplicationContext(), authorRelatedArticlesRecyclerView, this));
         mAuthorRelatedRVAdapter = new AuthorRelatedRVAdapter(new ArrayList<Article>(), getApplicationContext());
-        mAuthorRelatedArticlesRecyclerView.setAdapter(mAuthorRelatedRVAdapter);
+        authorRelatedArticlesRecyclerView.setAdapter(mAuthorRelatedRVAdapter);
     }
 
     private void queryRelatedArticles()
     {
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child(ARTICLE_REF);
-        Query queryCategory = databaseReference.orderByChild(QUERY_BY_CATEGORY).equalTo(mCategory);
+        Query queryCategory = databaseReference.orderByChild(QUERY_BY_CATEGORY).equalTo(mCategory).limitToLast(5);
         queryCategory.addValueEventListener(new ValueEventListener()
         {
             @Override
@@ -170,41 +183,11 @@ public class ArticleDetailActivity extends AppCompatActivity
             {
 
                 ArrayList<Article> articleArrayList = new ArrayList<>();
-                Article article;
+                Article actualArticle;
                 for (DataSnapshot snapData : dataSnapshot.getChildren())
                 {
-                    String authorUID = (String) snapData.child("authorUID").getValue();
-                    String articleID = (String) snapData.child("articleID").getValue();
-                    String authorFname = (String) snapData.child("authorFname").getValue();
-                    String authorLname = (String) snapData.child("authorLname").getValue();
-
-                    String category = (String) snapData.child("category").getValue();
-                    String lastUpdated = (String) snapData.child("lastUpdated").getValue();
-                    long numberOfClicks = (Long) snapData.child("numberOfClicks").getValue();
-                    String subTitle = (String) snapData.child("subtitle").getValue();
-
-                    long timeAndDateCreated = (Long) snapData.child("timeAndDateCreated").getValue();
-                    String title = (String) snapData.child("title").getValue();
-                    String urlToImage = (String) snapData.child("urlToImage").getValue();
-                    String articleData = (String) snapData.child("articleData").getValue();
-
-                    article =
-                            new Article
-                                    (articleID,
-                                            authorUID,
-                                            authorFname,
-                                            authorLname,
-                                            title,
-                                            subTitle,
-                                            articleData,
-                                            category,
-                                            timeAndDateCreated,
-                                            lastUpdated,
-                                            urlToImage,
-                                            numberOfClicks);
-
-                    Log.d(TAG, "onDataChange: We should be adding to the list by now ");
-                    articleArrayList.add(article);
+                    actualArticle = snapData.getValue(Article.class);
+                    articleArrayList.add(actualArticle);
                 }
                 mRelatedArticlesRVAdapter.loadRelatedArticleData(articleArrayList);
             }
@@ -220,48 +203,18 @@ public class ArticleDetailActivity extends AppCompatActivity
     private void queryAuthorRelatedArticleData()
     {
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child(ARTICLE_REF);
-        Query queryCategory = databaseReference.orderByChild(QUERY_BY_AUTHOR_ID).equalTo(mAuthorUID);
+        Query queryCategory = databaseReference.orderByChild(QUERY_BY_AUTHOR_ID).equalTo(mAuthorUID).limitToFirst(10);
         queryCategory.addValueEventListener(new ValueEventListener()
         {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot)
             {
                 ArrayList<Article> articleArrayList = new ArrayList<>();
-                Article article;
+                Article actualArticle;
                 for (DataSnapshot snapData : dataSnapshot.getChildren())
                 {
-                    String authorUID = (String) snapData.child("authorUID").getValue();
-                    String articleID = (String) snapData.child("articleID").getValue();
-                    String authorFname = (String) snapData.child("authorFname").getValue();
-                    String authorLname = (String) snapData.child("authorLname").getValue();
-
-                    String category = (String) snapData.child("category").getValue();
-                    String lastUpdated = (String) snapData.child("lastUpdated").getValue();
-                    long numberOfClicks = (Long) snapData.child("numberOfClicks").getValue();
-                    String subTitle = (String) snapData.child("subtitle").getValue();
-
-                    long timeAndDateCreated = (Long) snapData.child("timeAndDateCreated").getValue();
-                    String title = (String) snapData.child("title").getValue();
-                    String urlToImage = (String) snapData.child("urlToImage").getValue();
-                    String articleData = (String) snapData.child("articleData").getValue();
-
-                    article =
-                            new Article
-                                    (articleID,
-                                            authorUID,
-                                            authorFname,
-                                            authorLname,
-                                            title,
-                                            subTitle,
-                                            articleData,
-                                            category,
-                                            timeAndDateCreated,
-                                            lastUpdated,
-                                            urlToImage,
-                                            numberOfClicks);
-
-                    Log.d(TAG, "onDataChange: We should be adding to the list by now ");
-                    articleArrayList.add(article);
+                    actualArticle = snapData.getValue(Article.class);
+                    articleArrayList.add(actualArticle);
                 }
                 mAuthorRelatedRVAdapter.loadArticleData(articleArrayList);
             }
@@ -289,5 +242,160 @@ public class ArticleDetailActivity extends AppCompatActivity
                 .into(mCoverPhoto);
         mAuthorFullName.setText(mAuthorFname + " " + mAuthorLname);
         mDateView.setText(mTimeAndDateCreated);
+    }
+
+    @Override
+    public void onItemClick(View view, int position)
+    {
+        int viewId = view.getId();
+        switch (viewId)
+        {
+            case R.id.author_related_articles_card_view:
+                Article article = mAuthorRelatedRVAdapter.getArticle(position);
+                updateArticleClicks(article.getArticleID());
+                goToActualArticle(article);
+                break;
+            case R.id.related_articles_view:
+                Article related_article = mRelatedArticlesRVAdapter.getArticle(position);
+                updateArticleClicks(related_article.getArticleID());
+                goToActualArticle(related_article);
+                break;
+        }
+    }
+
+    @Override
+    public void onItemLongClick(View view, int position)
+    {
+        int viewId = view.getId();
+        switch (viewId)
+        {
+            case R.id.author_related_articles_card_view:
+                Article article = mAuthorRelatedRVAdapter.getArticle(position);
+                sharedIntent(article);
+                break;
+            case R.id.related_articles_view:
+                Article related_article = mRelatedArticlesRVAdapter.getArticle(position);
+                sharedIntent(related_article);
+                break;
+        }
+    }
+
+    @Override
+    public void onItemDoubleTap(View view, int position)
+    {
+        int viewId = view.getId();
+        switch (viewId)
+        {
+            case R.id.author_related_articles_card_view:
+                Article article = mAuthorRelatedRVAdapter.getArticle(position);
+                updateFav(article.getArticleID());
+                break;
+            case R.id.related_articles_view:
+                Article related_article = mRelatedArticlesRVAdapter.getArticle(position);
+                updateFav(related_article.getArticleID());
+                break;
+        }
+    }
+
+    private void sharedIntent(Article actualArticle)
+    {
+        Intent shareIntent = new Intent();
+        shareIntent.setAction(Intent.ACTION_SEND);
+        shareIntent.putExtra(Intent.EXTRA_TEXT, actualArticle.getTitle() + " - " + actualArticle.getUrlToImage());
+        shareIntent.setType("text/plain");
+        startActivity(Intent.createChooser(shareIntent, "Share With.."));
+    }
+
+    private void updateFav(final String articleID)
+    {
+        FirebaseUser firebaseUser = mAuth.getCurrentUser();
+        String UIDOfCurrentUser;
+        if (firebaseUser != null)
+        {
+            UIDOfCurrentUser = firebaseUser.getUid();
+
+            final DatabaseReference test = FirebaseDatabase.getInstance().getReference()
+                    .child(USERS_REF)
+                    .child(UIDOfCurrentUser)
+                    .child(FAVORITES_REF);
+            test.addListenerForSingleValueEvent(new ValueEventListener()
+            {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot)
+                {
+                    Log.d(TAG, "onDataChange: " + dataSnapshot.toString());
+                    GenericTypeIndicator<ArrayList<String>> arrayListGenericTypeIndicator
+                            = new GenericTypeIndicator<ArrayList<String>>()
+                    {
+                    };
+                    if (dataSnapshot.getValue() == null)
+                    {
+                        ArrayList<String> oneTimeInit = new ArrayList<>();
+                        oneTimeInit.add(articleID);
+                        test.setValue(oneTimeInit);
+                    }
+                    else if (dataSnapshot.getValue() != null)
+                    {
+                        ArrayList<String> listOfFavorites = dataSnapshot.getValue(arrayListGenericTypeIndicator);
+
+                        if (listOfFavorites.contains(articleID))
+                        {
+                            listOfFavorites.remove(articleID);
+                            test.setValue(listOfFavorites);
+                        }
+                        else if (!listOfFavorites.contains(articleID))
+                        {
+                            listOfFavorites.add(articleID);
+                            test.setValue(listOfFavorites);
+                        }
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError)
+                {
+
+                }
+            });
+        }
+    }
+
+    private void updateArticleClicks(String id)
+    {
+        final String articleRef = "ARTICLES";
+        final String numClicksRef = "numberOfClicks";
+        mDatabaseReference = FirebaseDatabase.getInstance().getReference().child(articleRef).child(id).child(numClicksRef);
+        mDatabaseReference.runTransaction(new Transaction.Handler()
+        {
+            @Override
+            public Transaction.Result doTransaction(MutableData mutableData)
+            {
+                Long currentValue = mutableData.getValue(Long.class);
+                if (currentValue == null || currentValue < 0)
+                {
+                    mutableData.setValue(1);
+                }
+                else
+                {
+                    mutableData.setValue(currentValue + 1);
+                }
+                return Transaction.success(mutableData);
+            }
+
+            @Override
+            public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot)
+            {
+                Log.d(TAG, "onComplete: Transaction Completed");
+            }
+        });
+        Log.d(TAG, "updateArticleClicks: " + mDatabaseReference.toString());
+    }
+
+    private void goToActualArticle(Article article)
+    {
+        final String key = "articledata";
+        Intent fullArticle = new Intent(getApplicationContext(), ArticleDetailActivity.class);
+        fullArticle.putExtra(key, article.toString());
+        startActivity(fullArticle);
     }
 }

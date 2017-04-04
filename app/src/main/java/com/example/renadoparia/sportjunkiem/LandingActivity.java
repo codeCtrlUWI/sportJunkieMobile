@@ -14,8 +14,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
@@ -45,7 +43,7 @@ public class LandingActivity extends AppCompatActivity implements
         Log.d(TAG, "onCreate: starts ");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_landing);
-        //Initialize Buttons
+
         initializeWidgets();
         makeFullScreen();
 
@@ -72,15 +70,9 @@ public class LandingActivity extends AppCompatActivity implements
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null)
                 {
-                    //TODO:Add Redirection
-                    Intent tempIntent = new Intent(getApplicationContext(), HomeActivity.class);
-                    startActivity(tempIntent);
-                    Log.d(TAG, "onAuthStateChanged: User is Signed In: " + user.getEmail());
-                    Log.d(TAG, "onAuthStateChanged: Name " + user.getDisplayName());
-                }
-                else
-                {
-                    Log.d(TAG, "onAuthStateChanged: User Is Not Signed In");
+                    Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
                 }
             }
         };
@@ -146,25 +138,7 @@ public class LandingActivity extends AppCompatActivity implements
                 Intent signUpForAcc = new Intent(getApplicationContext(), SignUpFormActivity.class);
                 startActivity(signUpForAcc);
                 break;
-//            case R.id.tempsineout:
-//                signOut();
-//                break;
         }
-    }
-
-    private void signOut()
-    {
-        mAuth.signOut();
-
-        Auth.GoogleSignInApi.signOut(mGoogleApiClient)
-                .setResultCallback(new ResultCallback<Status>()
-                {
-                    @Override
-                    public void onResult(@NonNull Status status)
-                    {
-                        Log.d(TAG, "onResult: " + status.getStatus().toString());
-                    }
-                });
     }
 
     private void googleSignIn()
@@ -230,11 +204,6 @@ public class LandingActivity extends AppCompatActivity implements
                             Log.d(TAG, "onComplete: Name: " + task.getResult().getUser().getDisplayName());
                             Log.d(TAG, "onComplete: Email:" + task.getResult().getUser().getEmail());
                             Log.d(TAG, "onComplete: Photo URL: " + task.getResult().getUser().getPhotoUrl());
-                        }
-                        else
-                        {
-                            Log.d(TAG, "onComplete: " + task.getException());
-                            Log.d(TAG, "onComplete: signed in not complete");
                         }
                     }
                 });
