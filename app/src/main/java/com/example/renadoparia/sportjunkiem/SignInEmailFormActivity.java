@@ -1,5 +1,6 @@
 package com.example.renadoparia.sportjunkiem;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -31,6 +32,8 @@ public class SignInEmailFormActivity extends AppCompatActivity implements View.O
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
 
+    private ProgressDialog mProgressDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -38,6 +41,7 @@ public class SignInEmailFormActivity extends AppCompatActivity implements View.O
         setContentView(R.layout.activity_sign_in_email_form);
         makeFullScreen();
         mAuth = FirebaseAuth.getInstance();
+        mProgressDialog = new ProgressDialog(this);
         mAuthStateListener = new FirebaseAuth.AuthStateListener()
         {
             @Override
@@ -130,6 +134,8 @@ public class SignInEmailFormActivity extends AppCompatActivity implements View.O
         }
         else
         {
+            mProgressDialog.setMessage("Signing In");
+            mProgressDialog.show();
             mAuth.signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener(this, new OnCompleteListener<AuthResult>()
                     {
@@ -139,7 +145,14 @@ public class SignInEmailFormActivity extends AppCompatActivity implements View.O
                             if (task.isSuccessful())
                             {
                                 //Do Query In Future For SnackBar To Get Their Name
+                                mProgressDialog.dismiss();
                                 Snackbar.make(v, "Welcome: " + task.getResult().getUser().getEmail(), Snackbar.LENGTH_LONG).show();
+                            }
+                            else
+                            {
+                                mProgressDialog.dismiss();
+                                Snackbar.make(v, "Invalid Email Or Password, Please Try Again", Snackbar.LENGTH_LONG).show();
+
                             }
                         }
                     });

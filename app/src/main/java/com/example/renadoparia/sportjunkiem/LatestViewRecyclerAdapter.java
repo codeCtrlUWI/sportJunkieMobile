@@ -18,12 +18,12 @@ import java.util.List;
 
 class LatestViewRecyclerAdapter extends RecyclerView.Adapter<LatestViewRecyclerAdapter.ListViewHolder>
 {
-    private List<Article> mArticlesList;
+    private List<FeaturedArticle> mLatestArticles;
     private Context mContext;
 
-    public LatestViewRecyclerAdapter(List<Article> articlesList, Context context)
+    public LatestViewRecyclerAdapter(List<FeaturedArticle> articlesList, Context context)
     {
-        mArticlesList = articlesList;
+        mLatestArticles = articlesList;
         mContext = context;
     }
 
@@ -38,11 +38,10 @@ class LatestViewRecyclerAdapter extends RecyclerView.Adapter<LatestViewRecyclerA
     public void onBindViewHolder(ListViewHolder holder, int position)
     {
 
-        Article actualArticle = mArticlesList.get(position);
+        FeaturedArticle actualArticle = mLatestArticles.get(position);
 
-        String timeAndDateString = actualArticle.getTimeAndDateCreated();
         holder.mTitle.setText(actualArticle.getTitle());
-        holder.mDateView.setText(timeAndDateString);
+        holder.mDateView.setText(actualArticle.getCategory());
         Picasso.with(mContext)
                 .load(actualArticle.getUrlToImage())
                 .error(R.drawable.ic_image_black_48dp)
@@ -52,9 +51,9 @@ class LatestViewRecyclerAdapter extends RecyclerView.Adapter<LatestViewRecyclerA
     @Override
     public int getItemCount()
     {
-        if ((mArticlesList != null) && (mArticlesList.size() != 0))
+        if ((mLatestArticles != null) && (mLatestArticles.size() != 0))
         {
-            return mArticlesList.size();
+            return mLatestArticles.size();
         }
         else
         {
@@ -62,15 +61,15 @@ class LatestViewRecyclerAdapter extends RecyclerView.Adapter<LatestViewRecyclerA
         }
     }
 
-    void loadArticleData(List<Article> data)
+    FeaturedArticle getArticle(int position)
     {
-        mArticlesList = data;
-        notifyDataSetChanged();
+        return ((mLatestArticles != null) && (mLatestArticles.size() != 0) ? mLatestArticles.get(position) : null);
     }
 
-    public Article getArticle(int position)
+    void loadArticleData(List<FeaturedArticle> articleList)
     {
-        return ((mArticlesList != null) && (mArticlesList.size() != 0) ? mArticlesList.get(position) : null);
+        mLatestArticles = articleList;
+        notifyDataSetChanged();
     }
 
     static class ListViewHolder extends RecyclerView.ViewHolder

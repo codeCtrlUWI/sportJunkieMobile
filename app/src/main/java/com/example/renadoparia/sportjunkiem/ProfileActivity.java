@@ -79,6 +79,10 @@ public class ProfileActivity extends AppCompatActivity
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth)
             {
                 FirebaseUser currentUser = firebaseAuth.getCurrentUser();
+                if (currentUser == null)
+                {
+                    startActivity(new Intent(getApplicationContext(), LandingActivity.class));
+                }
                 Log.d(TAG, "onAuthStateChanged: UID OF CURRENT USER = " + (currentUser != null ? currentUser.getUid() : null));
             }
         };
@@ -188,6 +192,10 @@ public class ProfileActivity extends AppCompatActivity
         if (id == R.id.goHome)
         {
             startActivity(new Intent(getApplicationContext(), HomeActivity.class));
+        }
+        if (id == R.id.logoutodoggo)
+        {
+            signOut();
         }
         return super.onOptionsItemSelected(item);
     }

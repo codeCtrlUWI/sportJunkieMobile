@@ -29,7 +29,7 @@ public class FeaturedCategoryFragment extends Fragment implements ValueEventList
 {
     private static final String TAG = "FeaturedCategoryFragmen";
     private String mCategory;
-    private static final String mArticleRef = "ARTICLES";
+    private static final String mArticleRef = "MICRO-ARTICLES";
     private static final String QUERY_BY_CATEGORY = "category";
 
     private RecyclerViewAdapter mRecyclerViewAdapter;
@@ -49,7 +49,7 @@ public class FeaturedCategoryFragment extends Fragment implements ValueEventList
 
         Query queryCategory = databaseReference.orderByChild(QUERY_BY_CATEGORY).equalTo(mCategory);
         Log.d(TAG, "onCreate: query: " + queryCategory.toString());
-        queryCategory.addValueEventListener(this);
+        queryCategory.addListenerForSingleValueEvent(this);
     }
 
 
@@ -63,7 +63,7 @@ public class FeaturedCategoryFragment extends Fragment implements ValueEventList
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
         recyclerView.setLayoutManager(linearLayoutManager);
 
-        mRecyclerViewAdapter = new RecyclerViewAdapter(new ArrayList<Article>(), getContext());
+        mRecyclerViewAdapter = new RecyclerViewAdapter(new ArrayList<FeaturedArticle>(), getContext());
         recyclerView.setAdapter(mRecyclerViewAdapter);
 
         return recyclerView;
@@ -79,17 +79,24 @@ public class FeaturedCategoryFragment extends Fragment implements ValueEventList
     @Override
     public void onDataChange(DataSnapshot dataSnapshot)
     {
-        ArrayList<Article> articleArrayList = new ArrayList<>();
-        Article actualArticle;
+        ArrayList<FeaturedArticle> featuredArticles = new ArrayList<>();
+        FeaturedArticle featuredArticle = null;
         for (DataSnapshot snapData : dataSnapshot.getChildren())
         {
-            actualArticle = snapData.getValue(Article.class);
-            articleArrayList.add(actualArticle);
+            Log.d(TAG, "onDataChange: data: " + snapData.toString());
+            String articleID = snapData.child("articleID").getValue().toString();
+            String title = snapData.child("title").getValue().toString();
+            String category = snapData.child("category").getValue().toString();
+            String urlToImage = snapData.child("urlToImage").getValue().toString();
+            Long numberOFClicks = (Long) snapData.child("numberOfClicks").getValue();
+
+            featuredArticle = new FeaturedArticle(articleID, title, category, urlToImage, numberOFClicks);
+            featuredArticles.add(featuredArticle);
         }
-        Collections.sort(articleArrayList, new Comparator<Article>()
+        Collections.sort(featuredArticles, new Comparator<FeaturedArticle>()
         {
             @Override
-            public int compare(Article o1, Article o2)
+            public int compare(FeaturedArticle o1, FeaturedArticle o2)
             {
                 if (o1.getNumberOfClicks() < o2.getNumberOfClicks())
                 {
@@ -101,9 +108,9 @@ public class FeaturedCategoryFragment extends Fragment implements ValueEventList
                 }
             }
         });
-        mRecyclerViewAdapter.loadArticleData(articleArrayList);
-        Log.d(TAG, "onDataChange: list: " + articleArrayList.toString());
-        Log.d(TAG, "onDataChange: CURRENT SIZE OF LIST: " + articleArrayList.size());
+        mRecyclerViewAdapter.loadArticleData(featuredArticles);
+        Log.d(TAG, "onDataChange: list: " + featuredArticles.toString());
+        Log.d(TAG, "onDataChange: CURRENT SIZE OF LIST: " + featuredArticles.size());
     }
 
 

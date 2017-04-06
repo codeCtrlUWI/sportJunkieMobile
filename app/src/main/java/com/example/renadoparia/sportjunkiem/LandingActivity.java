@@ -1,5 +1,6 @@
 package com.example.renadoparia.sportjunkiem;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -37,6 +38,8 @@ public class LandingActivity extends AppCompatActivity implements
     private DatabaseReference mDatabaseReference;
     private GoogleApiClient mGoogleApiClient;
 
+    private ProgressDialog mProgressDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -46,7 +49,7 @@ public class LandingActivity extends AppCompatActivity implements
 
         initializeWidgets();
         makeFullScreen();
-
+        mProgressDialog = new ProgressDialog(this);
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         mDatabaseReference = database.getReference().child(DB_CHILD);
 
@@ -179,6 +182,8 @@ public class LandingActivity extends AppCompatActivity implements
 
     private void fireBaseAuthWithGoogle(final GoogleSignInAccount googleSignInAccount)
     {
+        mProgressDialog.setMessage("Signing In..");
+        mProgressDialog.show();
         Log.d(TAG, "fireBaseAuthWithGoogle: " + googleSignInAccount.getId());
         Log.d(TAG, "fireBaseAuthWithGoogle: " + googleSignInAccount.getIdToken());
         AuthCredential credential = GoogleAuthProvider.getCredential(googleSignInAccount.getIdToken(), null);
@@ -200,6 +205,7 @@ public class LandingActivity extends AppCompatActivity implements
                                     task.getResult().getUser().getPhotoUrl().toString());
 
                             mDatabaseReference.child(task.getResult().getUser().getUid()).setValue(googleUser);
+                            mProgressDialog.dismiss();
                             Log.d(TAG, "onComplete: signed in complete ");
                             Log.d(TAG, "onComplete: Name: " + task.getResult().getUser().getDisplayName());
                             Log.d(TAG, "onComplete: Email:" + task.getResult().getUser().getEmail());

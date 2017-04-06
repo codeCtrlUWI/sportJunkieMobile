@@ -144,10 +144,10 @@
                 android:textSize="18sp"
                 tools:text="ArticleData"/>
 
-            <include layout="@layout/author_related_divider"/>
+            <include layout="@layout/gallery_divider"/>
 
             <android.support.v7.widget.RecyclerView
-                android:id="@+id/author_related_articles"
+                android:id="@+id/gallery_recyclerview"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginBottom="@dimen/md_keylines"
@@ -157,6 +157,15 @@
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/related_articles"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="@dimen/md_keylines"
+                android:layout_marginTop="@dimen/md_keylines"/>
+
+            <include layout="@layout/author_related_divider"/>
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/author_related_articles"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginBottom="@dimen/md_keylines"

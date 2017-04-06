@@ -19,10 +19,10 @@ import java.util.List;
 class RelatedArticlesRVAdapter extends RecyclerView.Adapter<RelatedArticlesRVAdapter.RelatedArticleViewHolder>
 {
     private static final String TAG = "RelatedArticlesRVAdapte";
-    private List<Article> mArticleList;
+    private List<FeaturedArticle> mArticleList;
     private Context mContext;
 
-    RelatedArticlesRVAdapter(List<Article> articleList, Context context)
+    RelatedArticlesRVAdapter(List<FeaturedArticle> articleList, Context context)
     {
         mArticleList = articleList;
         mContext = context;
@@ -38,7 +38,7 @@ class RelatedArticlesRVAdapter extends RecyclerView.Adapter<RelatedArticlesRVAda
     @Override
     public void onBindViewHolder(RelatedArticleViewHolder holder, int position)
     {
-        Article actualArticle = mArticleList.get(position);
+        FeaturedArticle actualArticle = mArticleList.get(position);
         holder.mTextView.setText(actualArticle.getTitle());
         Picasso.with(mContext)
                 .load(actualArticle.getUrlToImage())
@@ -59,13 +59,13 @@ class RelatedArticlesRVAdapter extends RecyclerView.Adapter<RelatedArticlesRVAda
         }
     }
 
-    void loadRelatedArticleData(List<Article> data)
+    void loadRelatedArticleData(List<FeaturedArticle> data)
     {
         mArticleList = data;
         notifyDataSetChanged();
     }
 
-    Article getArticle(int position)
+    FeaturedArticle getArticle(int position)
     {
         return ((mArticleList != null) && (mArticleList.size() != 0) ? mArticleList.get(position) : null);
     }

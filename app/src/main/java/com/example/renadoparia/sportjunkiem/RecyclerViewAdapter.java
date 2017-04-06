@@ -2,6 +2,7 @@ package com.example.renadoparia.sportjunkiem;
 
 import android.content.Context;
 import android.content.Intent;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -35,7 +36,8 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Artic
     private static final String TAG = "RecyclerViewAdapter";
     private static final String FAVORITES_REF = "favorites";
     private static final String USERS_REF = "USERS";
-    private List<Article> mArticleList;
+
+    private List<FeaturedArticle> mFeaturedArticles;
     private Context mContext;
     private FirebaseAuth mAuth;
 
@@ -45,9 +47,9 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Artic
     private DatabaseReference mDatabaseReference;
 
 
-    public RecyclerViewAdapter(List<Article> articleList, Context context)
+    public RecyclerViewAdapter(List<FeaturedArticle> featuredArticles, Context context)
     {
-        mArticleList = articleList;
+        mFeaturedArticles = featuredArticles;
         mContext = context;
     }
 
@@ -62,11 +64,11 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Artic
     @Override
     public void onBindViewHolder(ArticleViewHolder holder, int position)
     {
-        final Article actualArticle = mArticleList.get(position);
-        holder.mCategory.setText(actualArticle.getCategory());
-        holder.mTitle.setText(actualArticle.getTitle());
+        final FeaturedArticle featuredArticle = mFeaturedArticles.get(position);
+        holder.mCategory.setText(featuredArticle.getCategory());
+        holder.mTitle.setText(featuredArticle.getTitle());
         Picasso.with(mContext)
-                .load(actualArticle.getUrlToImage())
+                .load(featuredArticle.getUrlToImage())
                 .error(R.drawable.ic_image_black_48dp)
                 .into(holder.mSportPicture);
 
@@ -75,10 +77,9 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Artic
             @Override
             public void onClick(View v)
             {
-                String id = actualArticle.getArticleID();
-                Log.d(TAG, "onClick: Article Id: " + id);
+                String id = featuredArticle.getArticleID();
                 updateArticleClicks(id);
-                goToActualArticle(actualArticle);
+                goToActualArticle(featuredArticle);
             }
         });
         holder.itemView.findViewById(R.id.share_button).setOnClickListener(new View.OnClickListener()
@@ -86,7 +87,7 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Artic
             @Override
             public void onClick(View v)
             {
-                sharedIntent(actualArticle);
+                sharedIntent(featuredArticle);
             }
         });
 
@@ -95,9 +96,9 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Artic
             @Override
             public void onClick(View v)
             {
-                String id = actualArticle.getArticleID();
+                String id = featuredArticle.getArticleID();
                 updateArticleClicks(id);
-                goToActualArticle(actualArticle);
+                goToActualArticle(featuredArticle);
             }
         });
 
@@ -107,70 +108,77 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Artic
             @Override
             public void onClick(View v)
             {
-                //updateFavorites(actualArticle);
-                updateFav(actualArticle.getArticleID());
+                updateFavorites(featuredArticle.getArticleID(), v);
 
             }
         });
     }
 
-    private void updateFav(final String articleID)
+    private void updateFavorites(final String articleID, final View view)
     {
         mAuth = FirebaseAuth.getInstance();
         FirebaseUser firebaseUser = mAuth.getCurrentUser();
-        String UIDOfCurrentUser = firebaseUser != null ? firebaseUser.getUid() : null;
-        final DatabaseReference test = FirebaseDatabase.getInstance().getReference()
-                .child(USERS_REF)
-                .child(UIDOfCurrentUser)
-                .child(FAVORITES_REF);
-        test.addListenerForSingleValueEvent(new ValueEventListener()
+        if (firebaseUser != null)
         {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot)
+            String UIDOfCurrentUser = firebaseUser.getUid();
+
+            final DatabaseReference favoritesReference = FirebaseDatabase.getInstance().getReference()
+                    .child(USERS_REF)
+                    .child(UIDOfCurrentUser)
+                    .child(FAVORITES_REF);
+
+            favoritesReference.addListenerForSingleValueEvent(new ValueEventListener()
             {
-                Log.d(TAG, "onDataChange: " + dataSnapshot.toString());
-                GenericTypeIndicator<ArrayList<String>> arrayListGenericTypeIndicator
-                        = new GenericTypeIndicator<ArrayList<String>>()
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot)
                 {
-                };
-                if (dataSnapshot.getValue() == null)
-                {
-                    ArrayList<String> oneTimeInit = new ArrayList<>();
-                    oneTimeInit.add(articleID);
-                    test.setValue(oneTimeInit);
-                }
-                else if (dataSnapshot.getValue() != null)
-                {
-                    ArrayList<String> listOfFavorites = dataSnapshot.getValue(arrayListGenericTypeIndicator);
-
-                    if (listOfFavorites.contains(articleID))
+                    Log.d(TAG, "onDataChange: " + dataSnapshot.toString());
+                    GenericTypeIndicator<ArrayList<String>> arrayListGenericTypeIndicator
+                            = new GenericTypeIndicator<ArrayList<String>>()
                     {
-                        listOfFavorites.remove(articleID);
-                        test.setValue(listOfFavorites);
-                    }
-                    else if (!listOfFavorites.contains(articleID))
+                    };
+                    if (dataSnapshot.getValue() == null)
                     {
-                        listOfFavorites.add(articleID);
-                        test.setValue(listOfFavorites);
+                        ArrayList<String> oneTimeInit = new ArrayList<>();
+                        oneTimeInit.add(articleID);
+                        favoritesReference.setValue(oneTimeInit);
+                        Snackbar.make(view, "Added To Favorites", Snackbar.LENGTH_SHORT).show();
+                    }
+                    else if (dataSnapshot.getValue() != null)
+                    {
+                        ArrayList<String> listOfFavorites = dataSnapshot.getValue(arrayListGenericTypeIndicator);
+
+                        if (listOfFavorites.contains(articleID))
+                        {
+                            listOfFavorites.remove(articleID);
+                            favoritesReference.setValue(listOfFavorites);
+                            Snackbar.make(view, "Removed From Favorites", Snackbar.LENGTH_SHORT).show();
+                        }
+                        else if (!listOfFavorites.contains(articleID))
+                        {
+                            listOfFavorites.add(articleID);
+                            favoritesReference.setValue(listOfFavorites);
+                            Snackbar.make(view, "Added To Favorites", Snackbar.LENGTH_SHORT).show();
+                        }
                     }
                 }
-            }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError)
-            {
+                @Override
+                public void onCancelled(DatabaseError databaseError)
+                {
 
-            }
-        });
-
+                }
+            });
+        }
     }
 
     //http://stackoverflow.com/questions/4197135/how-to-start-activity-in-adapter
-    private void sharedIntent(Article actualArticle)
+    private void sharedIntent(FeaturedArticle actualArticle)
     {
         Intent shareIntent = new Intent();
         shareIntent.setAction(Intent.ACTION_SEND);
-        shareIntent.putExtra(Intent.EXTRA_TEXT, actualArticle.getTitle() + " - " + actualArticle.getUrlToImage());
+        shareIntent.putExtra(Intent.EXTRA_TEXT, actualArticle.getTitle() + " - " +
+                "https://sjapp-4c72a.firebaseapp.com/#/" + actualArticle.getCategory().toLowerCase() + "/view/" + actualArticle.getArticleID());
         shareIntent.setType("text/plain");
         mContext.startActivity(Intent.createChooser(shareIntent, "Share With.."));
     }
@@ -178,7 +186,7 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Artic
     //https://firebase.google.com/docs/database/admin/save-data#section-update
     private void updateArticleClicks(String id)
     {
-        final String articleRef = "ARTICLES";
+        final String articleRef = "MICRO-ARTICLES";
         final String numClicksRef = "numberOfClicks";
         mDatabaseReference = FirebaseDatabase.getInstance().getReference().child(articleRef).child(id).child(numClicksRef);
         mDatabaseReference.runTransaction(new Transaction.Handler()
@@ -207,20 +215,20 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Artic
         Log.d(TAG, "updateArticleClicks: " + mDatabaseReference.toString());
     }
 
-    private void goToActualArticle(Article article)
+    private void goToActualArticle(FeaturedArticle article)
     {
         final String key = "articledata";
         Intent fullArticle = new Intent(mContext, ArticleDetailActivity.class);
-        fullArticle.putExtra(key, article.toString());
+        fullArticle.putExtra(key, article.getArticleID());
         mContext.startActivity(fullArticle);
     }
 
     @Override
     public int getItemCount()
     {
-        if ((mArticleList != null) && (mArticleList.size() != 0))
+        if ((mFeaturedArticles != null) && (mFeaturedArticles.size() != 0))
         {
-            return mArticleList.size();
+            return mFeaturedArticles.size();
         }
         else
         {
@@ -228,14 +236,14 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Artic
         }
     }
 
-    Article getArticle(int position)
+    FeaturedArticle getArticle(int position)
     {
-        return ((mArticleList != null) && (mArticleList.size() != 0) ? mArticleList.get(position) : null);
+        return ((mFeaturedArticles != null) && (mFeaturedArticles.size() != 0) ? mFeaturedArticles.get(position) : null);
     }
 
-    void loadArticleData(List<Article> articleList)
+    void loadArticleData(List<FeaturedArticle> articleList)
     {
-        mArticleList = articleList;
+        mFeaturedArticles = articleList;
         notifyDataSetChanged();
     }
 

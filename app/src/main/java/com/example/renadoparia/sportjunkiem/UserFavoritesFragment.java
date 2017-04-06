@@ -36,7 +36,7 @@ public class UserFavoritesFragment extends Fragment implements OnRecyclerClickLi
     private static final String TAG = "UserFavoritesFragment";
     private static final String USERS_REF = "USERS";
     private static final String FAVORITES_REF = "favorites";
-    private static final String ARTICLES_REF = "ARTICLES";
+    private static final String ARTICLES_REF = "MICRO-ARTICLES";
 
     private UserFavoritesRVAdapter mUserFavoritesRVAdapter;
     private ArrayList<String> mFavoritesList = new ArrayList<>();
@@ -59,7 +59,7 @@ public class UserFavoritesFragment extends Fragment implements OnRecyclerClickLi
     @Override
     public void onItemClick(View view, int position)
     {
-        Article article = mUserFavoritesRVAdapter.getArticle(position);
+        FeaturedArticle article = mUserFavoritesRVAdapter.getArticle(position);
         updateArticleClicks(article.getArticleID());
         goToActualArticle(article);
     }
@@ -67,14 +67,14 @@ public class UserFavoritesFragment extends Fragment implements OnRecyclerClickLi
     @Override
     public void onItemLongClick(View view, int position)
     {
-        Article article = mUserFavoritesRVAdapter.getArticle(position);
+        FeaturedArticle article = mUserFavoritesRVAdapter.getArticle(position);
         sharedIntent(article);
     }
 
     @Override
     public void onItemDoubleTap(View view, int position)
     {
-        Article article = mUserFavoritesRVAdapter.getArticle(position);
+        FeaturedArticle article = mUserFavoritesRVAdapter.getArticle(position);
         updateFav(article.getArticleID());
     }
 
@@ -95,6 +95,7 @@ public class UserFavoritesFragment extends Fragment implements OnRecyclerClickLi
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot)
                 {
+
                     if (dataSnapshot.getValue() != null)
                     {
                         GenericTypeIndicator<ArrayList<String>> arrayListGenericTypeIndicator
@@ -106,7 +107,7 @@ public class UserFavoritesFragment extends Fragment implements OnRecyclerClickLi
 
                         //noinspection SuspiciousMethodCalls
                         mFavoritesList.removeAll(Collections.singleton(null));
-                        final ArrayList<Article> articleListing = new ArrayList<>();
+                        final ArrayList<FeaturedArticle> articleListing = new ArrayList<>();
 
                         for (int i = 0; i < mFavoritesList.size(); i++)
                         {
@@ -119,7 +120,7 @@ public class UserFavoritesFragment extends Fragment implements OnRecyclerClickLi
                                 @Override
                                 public void onDataChange(DataSnapshot dataSnapshot)
                                 {
-                                    Article article = dataSnapshot.getValue(Article.class);
+                                    FeaturedArticle article = dataSnapshot.getValue(FeaturedArticle.class);
                                     articleListing.add(article);
                                     mUserFavoritesRVAdapter.loadArticleData(articleListing);
                                 }
@@ -166,7 +167,7 @@ public class UserFavoritesFragment extends Fragment implements OnRecyclerClickLi
         //
         recyclerView.addOnItemTouchListener(new RecyclerItemClicker(getContext(), recyclerView, this));
 
-        mUserFavoritesRVAdapter = new UserFavoritesRVAdapter(new ArrayList<Article>(), getContext());
+        mUserFavoritesRVAdapter = new UserFavoritesRVAdapter(new ArrayList<FeaturedArticle>(), getContext());
         recyclerView.setAdapter(mUserFavoritesRVAdapter);
         return recyclerView;
     }
@@ -178,11 +179,11 @@ public class UserFavoritesFragment extends Fragment implements OnRecyclerClickLi
     }
 
     /*--------------------------------------------------------------------------------------------*/
-    private void sharedIntent(Article actualArticle)
+    private void sharedIntent(FeaturedArticle actualArticle)
     {
         Intent shareIntent = new Intent();
         shareIntent.setAction(Intent.ACTION_SEND);
-        shareIntent.putExtra(Intent.EXTRA_TEXT, actualArticle.getTitle() + " - " + actualArticle.getUrlToImage());
+        shareIntent.putExtra(Intent.EXTRA_TEXT, actualArticle.getTitle() + " - " + "https://sjapp-4c72a.firebaseapp.com/#/" + actualArticle.getCategory().toLowerCase() + "/view/" + actualArticle.getArticleID());
         shareIntent.setType("text/plain");
         startActivity(Intent.createChooser(shareIntent, "Share With.."));
     }
@@ -243,7 +244,7 @@ public class UserFavoritesFragment extends Fragment implements OnRecyclerClickLi
 
     private void updateArticleClicks(String id)
     {
-        final String articleRef = "ARTICLES";
+        final String articleRef = "MICRO-ARTICLES";
         final String numClicksRef = "numberOfClicks";
         mDatabaseReference = FirebaseDatabase.getInstance().getReference().child(articleRef).child(id).child(numClicksRef);
         mDatabaseReference.runTransaction(new Transaction.Handler()
@@ -272,11 +273,11 @@ public class UserFavoritesFragment extends Fragment implements OnRecyclerClickLi
         Log.d(TAG, "updateArticleClicks: " + mDatabaseReference.toString());
     }
 
-    private void goToActualArticle(Article article)
+    private void goToActualArticle(FeaturedArticle article)
     {
         final String key = "articledata";
         Intent fullArticle = new Intent(getApplicationContext(), ArticleDetailActivity.class);
-        fullArticle.putExtra(key, article.toString());
+        fullArticle.putExtra(key, article.getArticleID());
         startActivity(fullArticle);
     }
 }

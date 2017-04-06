@@ -19,10 +19,10 @@ import java.util.List;
 class UserFavoritesRVAdapter extends RecyclerView.Adapter<UserFavoritesRVAdapter.GridViewHolder>
 {
     private static final String TAG = "UserFavoritesRVAdapter";
-    private List<Article> mArticleList;
+    private List<FeaturedArticle> mArticleList;
     private Context mContext;
 
-    UserFavoritesRVAdapter(List<Article> articleList, Context context)
+    UserFavoritesRVAdapter(List<FeaturedArticle> articleList, Context context)
     {
         mArticleList = articleList;
         mContext = context;
@@ -38,12 +38,13 @@ class UserFavoritesRVAdapter extends RecyclerView.Adapter<UserFavoritesRVAdapter
     @Override
     public void onBindViewHolder(GridViewHolder holder, int position)
     {
-        Article actualArticle = mArticleList.get(position);
+        FeaturedArticle actualArticle = mArticleList.get(position);
         holder.title.setText(actualArticle.getTitle());
         Picasso.with(mContext)
                 .load(actualArticle.getUrlToImage())
                 .error(R.drawable.lgb2_blur)
                 .into(holder.backGroundImage);
+        /*http://stackoverflow.com/questions/10503728/android-imageview-long-press-and-regular-press*/
     }
 
     @Override
@@ -65,13 +66,13 @@ class UserFavoritesRVAdapter extends RecyclerView.Adapter<UserFavoritesRVAdapter
         notifyDataSetChanged();
     }
 
-    void loadArticleData(List<Article> articleList)
+    void loadArticleData(List<FeaturedArticle> articleList)
     {
         mArticleList = articleList;
         notifyDataSetChanged();
     }
 
-    Article getArticle(int position)
+    FeaturedArticle getArticle(int position)
     {
         return ((mArticleList != null) && (mArticleList.size() != 0) ? mArticleList.get(position) : null);
     }

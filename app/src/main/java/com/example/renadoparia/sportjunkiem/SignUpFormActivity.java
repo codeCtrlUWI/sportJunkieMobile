@@ -1,6 +1,7 @@
 package com.example.renadoparia.sportjunkiem;
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -58,6 +59,7 @@ public class SignUpFormActivity extends AppCompatActivity implements View.OnClic
     private Button mRegisterButton;
     private Button mClearPhotoButton;
     private Uri mImageUri;
+    private ProgressDialog mProgressDialog;
 
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
@@ -90,7 +92,7 @@ public class SignUpFormActivity extends AppCompatActivity implements View.OnClic
         galleryImagePermissionRequest();
 
         mAuth = FirebaseAuth.getInstance();
-
+        mProgressDialog = new ProgressDialog(this);
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         mDatabaseRef = database.getReference(DB_CHILD);
         mStorageRef = FirebaseStorage.getInstance().getReference().child(NAME_OF_FOLDER_FOR_PROFILEPIC);
@@ -294,7 +296,6 @@ public class SignUpFormActivity extends AppCompatActivity implements View.OnClic
         }
         else if (ContextCompat.checkSelfPermission(this, PERMISSION_READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
         {
-            Toast.makeText(getApplicationContext(), "Cannot Access Photos, Needs Permission", Toast.LENGTH_SHORT).show();
             mProfilePictureButton.setEnabled(false);
         }
     }
@@ -325,6 +326,8 @@ public class SignUpFormActivity extends AppCompatActivity implements View.OnClic
         }
         else
         {
+            mProgressDialog.setMessage("Signing Up");
+            mProgressDialog.show();
             mAuth.createUserWithEmailAndPassword(email, password)
                     .addOnCompleteListener(this, new OnCompleteListener<AuthResult>()
                     {
@@ -349,6 +352,7 @@ public class SignUpFormActivity extends AppCompatActivity implements View.OnClic
                                             User user = new User(fName, lName, email, userUID, profilePicUri.toString());
                                             mDatabaseRef.child(userUID).setValue(user);
                                             Snackbar.make(view, "Welcome: " + fName + " " + lName, Snackbar.LENGTH_LONG).show();
+                                            mProgressDialog.dismiss();
                                         }
                                     }).addOnFailureListener(new OnFailureListener()
                                     {
@@ -356,6 +360,7 @@ public class SignUpFormActivity extends AppCompatActivity implements View.OnClic
                                         public void onFailure(@NonNull Exception e)
                                         {
                                             Log.d(TAG, "onFailure: Failed To Upload");
+                                            mProgressDialog.dismiss();
                                             e.printStackTrace();
                                         }
                                     });
@@ -371,6 +376,7 @@ public class SignUpFormActivity extends AppCompatActivity implements View.OnClic
                                             User user = new User(fName, lName, email, userUID, uri.toString());
                                             mDatabaseRef.child(userUID).setValue(user);
                                             Snackbar.make(view, "Welcome: " + fName + " " + lName, Snackbar.LENGTH_LONG).show();
+                                            mProgressDialog.dismiss();
                                         }
                                     }).addOnFailureListener(new OnFailureListener()
                                     {
@@ -390,6 +396,7 @@ public class SignUpFormActivity extends AppCompatActivity implements View.OnClic
                                                     User user = new User(fName, lName, email, userUID, appBasedimg.toString());
                                                     mDatabaseRef.child(userUID).setValue(user);
                                                     Snackbar.make(view, "Welcome: " + fName + " " + lName, Snackbar.LENGTH_LONG).show();
+                                                    mProgressDialog.dismiss();
                                                 }
                                             }).addOnFailureListener(new OnFailureListener()
                                             {
@@ -397,6 +404,7 @@ public class SignUpFormActivity extends AppCompatActivity implements View.OnClic
                                                 public void onFailure(@NonNull Exception e)
                                                 {
                                                     //Ok, Fuck It All, You Don't wanna work, fuck it all
+                                                    mProgressDialog.dismiss();
                                                 }
                                             });
 
@@ -474,6 +482,7 @@ public class SignUpFormActivity extends AppCompatActivity implements View.OnClic
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {
         super.onActivityResult(requestCode, resultCode, data);
+
         if (requestCode == GALLERY_REQUEST_CODE && resultCode == RESULT_OK)
         {
             try

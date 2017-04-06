@@ -33,7 +33,7 @@ import java.util.ArrayList;
 
 public class LatestContentFragment extends Fragment implements ValueEventListener, OnRecyclerClickListener
 {
-    private static final String mArticleRef = "ARTICLES";
+    private static final String mArticleRef = "MICRO-ARTICLES";
 
     private DatabaseReference mDatabaseReference;
     private String mCategory;
@@ -86,14 +86,15 @@ public class LatestContentFragment extends Fragment implements ValueEventListene
     {
         RecyclerView recyclerView = (RecyclerView) inflater.inflate(R.layout.recycler_view, container, false);
         recyclerView.setHasFixedSize(true);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, true);
+        linearLayoutManager.setStackFromEnd(true);
         recyclerView.setLayoutManager(linearLayoutManager);
 
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(), linearLayoutManager.getOrientation());
         recyclerView.addItemDecoration(dividerItemDecoration);
         recyclerView.addOnItemTouchListener(new RecyclerItemClicker(getContext(), recyclerView, this));
 
-        mLatestViewAdapter = new LatestViewRecyclerAdapter(new ArrayList<Article>(), getContext());
+        mLatestViewAdapter = new LatestViewRecyclerAdapter(new ArrayList<FeaturedArticle>(), getContext());
         recyclerView.setAdapter(mLatestViewAdapter);
 
         return recyclerView;
@@ -103,7 +104,7 @@ public class LatestContentFragment extends Fragment implements ValueEventListene
     @Override
     public void onItemClick(View view, int position)
     {
-        Article article = mLatestViewAdapter.getArticle(position);
+        FeaturedArticle article = mLatestViewAdapter.getArticle(position);
         updateArticleClicks(article.getArticleID());
         goToActualArticle(article);
     }
@@ -111,22 +112,22 @@ public class LatestContentFragment extends Fragment implements ValueEventListene
     @Override
     public void onItemLongClick(View view, int position)
     {
-        Article article = mLatestViewAdapter.getArticle(position);
+        FeaturedArticle article = mLatestViewAdapter.getArticle(position);
         sharedIntent(article);
     }
 
     @Override
     public void onItemDoubleTap(View view, int position)
     {
-        Article article = mLatestViewAdapter.getArticle(position);
+        FeaturedArticle article = mLatestViewAdapter.getArticle(position);
         updateFav(article.getArticleID(), view);
     }
 
-    private void sharedIntent(Article actualArticle)
+    private void sharedIntent(FeaturedArticle actualArticle)
     {
         Intent shareIntent = new Intent();
         shareIntent.setAction(Intent.ACTION_SEND);
-        shareIntent.putExtra(Intent.EXTRA_TEXT, actualArticle.getTitle() + " - " + actualArticle.getUrlToImage());
+        shareIntent.putExtra(Intent.EXTRA_TEXT, actualArticle.getTitle() + " - " + "https://sjapp-4c72a.firebaseapp.com/#/" + actualArticle.getCategory().toLowerCase() + "/view/" + actualArticle.getArticleID());
         shareIntent.setType("text/plain");
         startActivity(Intent.createChooser(shareIntent, "Share With.."));
     }
@@ -190,7 +191,7 @@ public class LatestContentFragment extends Fragment implements ValueEventListene
 
     private void updateArticleClicks(String id)
     {
-        final String articleRef = "ARTICLES";
+        final String articleRef = "MICRO-ARTICLES";
         final String numClicksRef = "numberOfClicks";
         mDatabaseReference = FirebaseDatabase.getInstance().getReference().child(articleRef).child(id).child(numClicksRef);
         mDatabaseReference.runTransaction(new Transaction.Handler()
@@ -222,14 +223,22 @@ public class LatestContentFragment extends Fragment implements ValueEventListene
     @Override
     public void onDataChange(DataSnapshot dataSnapshot)
     {
-        ArrayList<Article> articleArrayList = new ArrayList<>();
-        Article actualArticle;
+        ArrayList<FeaturedArticle> featuredArticles = new ArrayList<>();
+        FeaturedArticle featuredArticle = null;
         for (DataSnapshot snapData : dataSnapshot.getChildren())
         {
-            actualArticle = snapData.getValue(Article.class);
-            articleArrayList.add(actualArticle);
+            Log.d(TAG, "onDataChange: data: " + snapData.toString());
+            String articleID = snapData.child("articleID").getValue().toString();
+            String title = snapData.child("title").getValue().toString();
+            String category = snapData.child("category").getValue().toString();
+            String urlToImage = snapData.child("urlToImage").getValue().toString();
+            Long numberOFClicks = (Long) snapData.child("numberOfClicks").getValue();
+
+            featuredArticle = new FeaturedArticle(articleID, title, category, urlToImage, numberOFClicks);
+            featuredArticles.add(featuredArticle);
+
         }
-        mLatestViewAdapter.loadArticleData(articleArrayList);
+        mLatestViewAdapter.loadArticleData(featuredArticles);
     }
 
     @Override
@@ -238,11 +247,12 @@ public class LatestContentFragment extends Fragment implements ValueEventListene
 
     }
 
-    private void goToActualArticle(Article article)
+    private void goToActualArticle(FeaturedArticle article)
     {
         final String key = "articledata";
         Intent fullArticle = new Intent(getContext(), ArticleDetailActivity.class);
-        fullArticle.putExtra(key, article.toString());
+        fullArticle.putExtra(key, article.getArticleID());
         startActivity(fullArticle);
     }
+
 }
