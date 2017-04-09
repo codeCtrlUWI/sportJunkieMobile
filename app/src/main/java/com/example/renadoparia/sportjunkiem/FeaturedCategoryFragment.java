@@ -33,6 +33,7 @@ public class FeaturedCategoryFragment extends Fragment implements ValueEventList
     private static final String QUERY_BY_CATEGORY = "category";
 
     private RecyclerViewAdapter mRecyclerViewAdapter;
+    private Query queryCategory;
 
 
     public FeaturedCategoryFragment()
@@ -47,7 +48,7 @@ public class FeaturedCategoryFragment extends Fragment implements ValueEventList
         mCategory = getArguments().getString("Tag");
         Log.d(TAG, "onCreate: tag: " + mCategory);
 
-        Query queryCategory = databaseReference.orderByChild(QUERY_BY_CATEGORY).equalTo(mCategory);
+        queryCategory = databaseReference.orderByChild(QUERY_BY_CATEGORY).equalTo(mCategory);
         Log.d(TAG, "onCreate: query: " + queryCategory.toString());
         queryCategory.addListenerForSingleValueEvent(this);
     }
@@ -80,7 +81,7 @@ public class FeaturedCategoryFragment extends Fragment implements ValueEventList
     public void onDataChange(DataSnapshot dataSnapshot)
     {
         ArrayList<FeaturedArticle> featuredArticles = new ArrayList<>();
-        FeaturedArticle featuredArticle = null;
+        FeaturedArticle featuredArticle;
         for (DataSnapshot snapData : dataSnapshot.getChildren())
         {
             Log.d(TAG, "onDataChange: data: " + snapData.toString());
@@ -118,5 +119,12 @@ public class FeaturedCategoryFragment extends Fragment implements ValueEventList
     public void onCancelled(DatabaseError databaseError)
     {
 
+    }
+
+    @Override
+    public void onStop()
+    {
+        super.onStop();
+        queryCategory.removeEventListener(this);
     }
 }

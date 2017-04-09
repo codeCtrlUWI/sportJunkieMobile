@@ -18,6 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.ConnectionResult;
@@ -31,7 +32,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -139,7 +139,7 @@ public class ProfileActivity extends AppCompatActivity
                         User user = dataSnapshot.getValue(User.class);
                         Log.d(TAG, "onDataChange: user = " + user.toString());
                         mCollapsingToolbarLayout.setTitle(user.getFirstName() + " " + user.getLastName());
-                        Picasso.with(getApplicationContext())
+                        Glide.with(getApplicationContext())
                                 .load(user.getProfilePicURL())
                                 .error(R.drawable.lgb2_blur)
                                 .into(mProfilePicture);

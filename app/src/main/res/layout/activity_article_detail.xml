@@ -90,6 +90,7 @@
     </android.support.design.widget.AppBarLayout>
 
     <android.support.v4.widget.NestedScrollView
+        android:id="@+id/nestedScrollView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
@@ -174,4 +175,57 @@
         </LinearLayout>
 
     </android.support.v4.widget.NestedScrollView>
+
+    <!--<android.support.design.widget.FloatingActionButton-->
+    <!--android:id="@+id/homefab"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_gravity="bottom|end"-->
+    <!--android:layout_margin="16dp"-->
+    <!--app:backgroundTint="@color/colorAccent"-->
+    <!--app:elevation="24dp"-->
+    <!--app:fabSize="mini"-->
+    <!--app:srcCompat="@drawable/ic_home_white_24dp"/>-->
+
+
+    <!--<android.support.design.widget.FloatingActionButton-->
+    <!--android:id="@+id/sharefab"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_gravity="bottom|end"-->
+    <!--android:layout_margin="16dp"-->
+    <!--app:backgroundTint="@color/colorPrimaryDark"-->
+    <!--app:elevation="24dp"-->
+    <!--app:fabSize="mini"-->
+    <!--app:layout_anchorGravity="top"-->
+    <!--app:srcCompat="@drawable/ic_share_white_24dp"-->
+    <!--app:useCompatPadding="true"/>-->
+
+    <!--https://codedump.io/share/8bXUJ4AOdFVL/1/two-floating-action-buttons-next-to-each-other-->
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/homefab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="16dp"
+        android:src="@drawable/ic_home_white_24dp"
+        app:fabSize="mini"/>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/sharefab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|end"
+        android:layout_marginBottom="64dp"
+        android:layout_marginEnd="0dp"
+        android:layout_marginLeft="0dp"
+        android:layout_marginRight="0dp"
+        android:layout_marginStart="0dp"
+        android:layout_marginTop="0dp"
+        android:src="@drawable/ic_share_white_24dp"
+        app:backgroundTint="@color/colorPrimaryDark"
+        app:fabSize="mini"
+        app:layout_anchor="@id/homefab"
+        app:layout_anchorGravity="top"/>
+
 </android.support.design.widget.CoordinatorLayout>

@@ -8,12 +8,13 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.squareup.picasso.Picasso;
+import com.bumptech.glide.Glide;
 
 import java.util.List;
 
 /**
  * Created by Renado_Paria on 3/27/2017 at 10:41 PM for SportJunkieM.
+ * 
  */
 
 class LatestViewRecyclerAdapter extends RecyclerView.Adapter<LatestViewRecyclerAdapter.ListViewHolder>
@@ -21,7 +22,7 @@ class LatestViewRecyclerAdapter extends RecyclerView.Adapter<LatestViewRecyclerA
     private List<FeaturedArticle> mLatestArticles;
     private Context mContext;
 
-    public LatestViewRecyclerAdapter(List<FeaturedArticle> articlesList, Context context)
+    LatestViewRecyclerAdapter(List<FeaturedArticle> articlesList, Context context)
     {
         mLatestArticles = articlesList;
         mContext = context;
@@ -42,7 +43,7 @@ class LatestViewRecyclerAdapter extends RecyclerView.Adapter<LatestViewRecyclerA
 
         holder.mTitle.setText(actualArticle.getTitle());
         holder.mDateView.setText(actualArticle.getCategory());
-        Picasso.with(mContext)
+        Glide.with(mContext)
                 .load(actualArticle.getUrlToImage())
                 .error(R.drawable.ic_image_black_48dp)
                 .into(holder.sportPicture);

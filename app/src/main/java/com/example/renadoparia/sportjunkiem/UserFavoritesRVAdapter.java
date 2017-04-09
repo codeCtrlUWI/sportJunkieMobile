@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.squareup.picasso.Picasso;
+import com.bumptech.glide.Glide;
 
 import java.util.List;
 
@@ -40,7 +40,7 @@ class UserFavoritesRVAdapter extends RecyclerView.Adapter<UserFavoritesRVAdapter
     {
         FeaturedArticle actualArticle = mArticleList.get(position);
         holder.title.setText(actualArticle.getTitle());
-        Picasso.with(mContext)
+        Glide.with(mContext)
                 .load(actualArticle.getUrlToImage())
                 .error(R.drawable.lgb2_blur)
                 .into(holder.backGroundImage);

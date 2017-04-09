@@ -1,6 +1,5 @@
 package com.example.renadoparia.sportjunkiem;
 
-import android.app.Dialog;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -8,20 +7,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.squareup.picasso.Picasso;
+import com.bumptech.glide.Glide;
 
 import java.util.List;
 
 /**
  * Created by Renado_Paria on 4/4/2017 at 5:29 PM for SportJunkieM.
+ * Adapter For The Gallery In The Article Detail Activity
  */
 
 class GalleryRVAdapter extends RecyclerView.Adapter<GalleryRVAdapter.GalleryViewHolder>
 {
     private List<String> mPhotosList;
     private Context mContext;
-    private Boolean isImageLongPressed = false;
-    private Dialog builder;
+//    private Boolean isImageLongPressed = false;
+//    private Dialog builder;
 
     GalleryRVAdapter(List<String> photosList, Context context)
     {
@@ -40,7 +40,7 @@ class GalleryRVAdapter extends RecyclerView.Adapter<GalleryRVAdapter.GalleryView
     public void onBindViewHolder(GalleryViewHolder holder, int position)
     {
         String imageUrl = mPhotosList.get(position);
-        Picasso.with(mContext)
+        Glide.with(mContext)
                 .load(imageUrl)
                 .error(R.drawable.lgb2_blur)
                 .into(holder.galleryImage);

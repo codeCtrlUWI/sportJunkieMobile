@@ -12,6 +12,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -22,7 +23,6 @@ import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.MutableData;
 import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,8 +67,9 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Artic
         final FeaturedArticle featuredArticle = mFeaturedArticles.get(position);
         holder.mCategory.setText(featuredArticle.getCategory());
         holder.mTitle.setText(featuredArticle.getTitle());
-        Picasso.with(mContext)
+        Glide.with(mContext)
                 .load(featuredArticle.getUrlToImage())
+                .crossFade()
                 .error(R.drawable.ic_image_black_48dp)
                 .into(holder.mSportPicture);
 

@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -13,6 +14,8 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -20,6 +23,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -35,7 +39,7 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
-public class ArticleDetailActivity extends AppCompatActivity implements OnRecyclerClickListener, ValueEventListener
+public class ArticleDetailActivity extends AppCompatActivity implements OnRecyclerClickListener, ValueEventListener, View.OnClickListener
 {
     private static final String TAG = "ArticleDetailActivity";
     private static final String KEY = "articledata";
@@ -66,6 +70,7 @@ public class ArticleDetailActivity extends AppCompatActivity implements OnRecycl
     private TextView mSubTitleArticle;
     private TextView mActualArticle;
     private ImageView mCoverPhoto;
+    private ImageView mAuthorProfilePic;
 
     private TextView mAuthorFullName;
     private TextView mDateView;
@@ -75,6 +80,9 @@ public class ArticleDetailActivity extends AppCompatActivity implements OnRecycl
     private GalleryRVAdapter mGalleryAdapter;
 
     private FirebaseAuth mAuth;
+    private Query query;
+
+    private Article mArticle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -99,7 +107,7 @@ public class ArticleDetailActivity extends AppCompatActivity implements OnRecycl
         Log.d(TAG, "onCreate: article data: " + articleID);
 
         DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference().child(ARTICLE_REF);
-        Query query = databaseRef.child(articleID);
+        query = databaseRef.child(articleID);
         query.addListenerForSingleValueEvent(this);
 
 //        else if (mGalleryID == null)
@@ -115,17 +123,17 @@ public class ArticleDetailActivity extends AppCompatActivity implements OnRecycl
     @Override
     public void onDataChange(DataSnapshot dataSnapshot)
     {
-        Article actualArticle = dataSnapshot.getValue(Article.class);
-        mAuthorUID = actualArticle.getAuthorUID();
-        mArticleData = actualArticle.getArticleData();
-        mAuthorLname = actualArticle.getAuthorLname();
-        mAuthorFname = actualArticle.getAuthorFname();
-        mTitle = actualArticle.getTitle();
-        mSubtitle = actualArticle.getSubtitle();
-        mCategory = actualArticle.getCategory();
-        mTimeAndDateCreated = actualArticle.getTimeAndDateCreated();
-        mGalleryID = actualArticle.getGalleryID();
-        mUrlToImage = actualArticle.getUrlToImage();
+        mArticle = dataSnapshot.getValue(Article.class);
+        mAuthorUID = mArticle.getAuthorUID();
+        mArticleData = mArticle.getArticleData();
+        mAuthorLname = mArticle.getAuthorLname();
+        mAuthorFname = mArticle.getAuthorFname();
+        mTitle = mArticle.getTitle();
+        mSubtitle = mArticle.getSubtitle();
+        mCategory = mArticle.getCategory();
+        mTimeAndDateCreated = mArticle.getTimeAndDateCreated();
+        mGalleryID = mArticle.getGalleryID();
+        mUrlToImage = mArticle.getUrlToImage();
 
         setUpArticleFluff();
         relatedArticlesRecyclerViewSetup();
@@ -155,6 +163,25 @@ public class ArticleDetailActivity extends AppCompatActivity implements OnRecycl
 
         mAuthorFullName = (TextView) findViewById(R.id.authorName);
         mDateView = (TextView) findViewById(R.id.dateCreated);
+        mAuthorProfilePic = (ImageView) findViewById(R.id.authorProfilePicture);
+        FloatingActionButton homeFab = (FloatingActionButton) findViewById(R.id.homefab);
+        //Maybe we could just set the listener, let's try below
+        findViewById(R.id.sharefab).setOnClickListener(this);
+        homeFab.setOnClickListener(this);
+    }
+
+    @Override
+    public void onClick(View v)
+    {
+        int id = v.getId();
+        if (id == R.id.homefab)
+        {
+            startActivity(new Intent(this, HomeActivity.class));
+        }
+        if (id == R.id.sharefab)
+        {
+            sharedIntent();
+        }
     }
 
     private void relatedArticlesRecyclerViewSetup()
@@ -231,7 +258,7 @@ public class ArticleDetailActivity extends AppCompatActivity implements OnRecycl
     {
         final String microArticleRef = "MICRO-ARTICLES";
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child(microArticleRef);
-        Query queryCategory = databaseReference.orderByChild(QUERY_BY_AUTHOR_ID).equalTo(mAuthorUID).limitToFirst(10);
+        Query queryCategory = databaseReference.orderByChild(QUERY_BY_AUTHOR_ID).equalTo(mAuthorUID).limitToLast(5);
         queryCategory.addListenerForSingleValueEvent(new ValueEventListener()
         {
             @Override
@@ -308,12 +335,36 @@ public class ArticleDetailActivity extends AppCompatActivity implements OnRecycl
         mTitleArticle.setText(mTitle);
         mSubTitleArticle.setText(mSubtitle);
         mActualArticle.setText(mArticleData);
-        Picasso.with(getApplicationContext())
+        Glide.with(getApplicationContext())
                 .load(mUrlToImage)
                 .error(R.drawable.ic_image_black_48dp)
                 .into(mCoverPhoto);
         mAuthorFullName.setText(mAuthorFname + " " + mAuthorLname);
         mDateView.setText(mTimeAndDateCreated);
+        setUpAuthorPic();
+    }
+
+    private void setUpAuthorPic()
+    {
+        DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference().child("USERS").child(mAuthorUID).child("profilePicURL");
+        usersRef.addListenerForSingleValueEvent(new ValueEventListener()
+        {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot)
+            {
+                Glide.with(getApplicationContext())
+                        .load(dataSnapshot.getValue().toString())
+                        .fitCenter()
+                        .crossFade()
+                        .into(mAuthorProfilePic);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError)
+            {
+
+            }
+        });
     }
 
     @Override
@@ -389,7 +440,20 @@ public class ArticleDetailActivity extends AppCompatActivity implements OnRecycl
     {
         Intent shareIntent = new Intent();
         shareIntent.setAction(Intent.ACTION_SEND);
-        shareIntent.putExtra(Intent.EXTRA_TEXT, actualArticle.getTitle() + " - " + "https://sjapp-4c72a.firebaseapp.com/#/" + actualArticle.getCategory().toLowerCase() + "/view/" + actualArticle.getArticleID());
+        shareIntent.putExtra
+                (Intent.EXTRA_TEXT, actualArticle.getTitle() + " - " + "https://sjapp-4c72a.firebaseapp.com/#/" +
+                        actualArticle.getCategory().toLowerCase() + "/view/" + actualArticle.getArticleID());
+        shareIntent.setType("text/plain");
+        startActivity(Intent.createChooser(shareIntent, "Share With.."));
+    }
+
+    private void sharedIntent()
+    {
+        Intent shareIntent = new Intent();
+        shareIntent.setAction(Intent.ACTION_SEND);
+        shareIntent.putExtra
+                (Intent.EXTRA_TEXT, mArticle.getTitle() + " - " + "https://sjapp-4c72a.firebaseapp.com/#/" +
+                        mArticle.getCategory().toLowerCase() + "/view/" + mArticle.getArticleID());
         shareIntent.setType("text/plain");
         startActivity(Intent.createChooser(shareIntent, "Share With.."));
     }
@@ -490,6 +554,43 @@ public class ArticleDetailActivity extends AppCompatActivity implements OnRecycl
         // fullArticle.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         finish();
         startActivity(fullArticle);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        getMenuInflater().inflate(R.menu.article_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+        if (id == R.id.home)
+        {
+            startActivity(new Intent(this, HomeActivity.class));
+        }
+        if (id == R.id.profile)
+        {
+            startActivity(new Intent(this, ProfileActivity.class));
+        }
+        if (id == R.id.share)
+        {
+            sharedIntent();
+        }
+        return super.onOptionsItemSelected(item);
+
+    }
+
+    @Override
+    protected void onStop()
+    {
+        super.onStop();
+        query.removeEventListener(this);
     }
 }
 

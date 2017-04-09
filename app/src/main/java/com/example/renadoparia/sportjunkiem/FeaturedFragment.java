@@ -38,6 +38,8 @@ public class FeaturedFragment extends Fragment implements ValueEventListener, On
     private static final String FAVORITES_REF = "favorites";
 
     private RecyclerViewAdapter mRecyclerViewAdapter;
+    private DatabaseReference mDatabaseReference;
+    private Query queryArticles;
 
     public FeaturedFragment()
     {
@@ -48,14 +50,13 @@ public class FeaturedFragment extends Fragment implements ValueEventListener, On
     {
         super.onCreate(savedInstanceState);
         mAuth = FirebaseAuth.getInstance();
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child(mArticleRef);
+        mDatabaseReference = FirebaseDatabase.getInstance().getReference().child(mArticleRef);
         String category = getArguments().getString("Tag");
-        Query queryArticles;
-
         if (category != null && category.equalsIgnoreCase(HomeActivity.NO_MENU_ITEM_SELECTED))
         {
-            queryArticles = databaseReference.orderByChild(QUERY_ALL_ARTICLES).startAt(0).endAt(Long.MAX_VALUE);
-            queryArticles.addValueEventListener(this);
+            queryArticles = mDatabaseReference.orderByChild(QUERY_ALL_ARTICLES).startAt(0).endAt(Long.MAX_VALUE);
+            queryArticles.addListenerForSingleValueEvent(this);
+            // queryArticles.removeEventListener(this);
             mTitle = getString(R.string.home);
         }
         Log.d(TAG, "onCreate: tag: " + category);
@@ -113,7 +114,7 @@ public class FeaturedFragment extends Fragment implements ValueEventListener, On
     public void onDataChange(DataSnapshot dataSnapshot)
     {
         ArrayList<FeaturedArticle> featuredArticles = new ArrayList<>();
-        FeaturedArticle featuredArticle = null;
+        FeaturedArticle featuredArticle;
         for (DataSnapshot snapData : dataSnapshot.getChildren())
         {
             Log.d(TAG, "onDataChange: data: " + snapData.toString());
@@ -156,6 +157,7 @@ public class FeaturedFragment extends Fragment implements ValueEventListener, On
     {
         super.onStop();
         Log.d(TAG, "onStop: called");
+        queryArticles.removeEventListener(this);
     }
 
     @Override
@@ -178,4 +180,7 @@ public class FeaturedFragment extends Fragment implements ValueEventListener, On
         super.onDestroy();
         Log.d(TAG, "onDestroy: destroyed called");
     }
+
+//    http://stackoverflow.com/questions/33776195/how-to-keep-track-of-listeners-in-firebase-on-android
+//    The above is a potential solution
 }

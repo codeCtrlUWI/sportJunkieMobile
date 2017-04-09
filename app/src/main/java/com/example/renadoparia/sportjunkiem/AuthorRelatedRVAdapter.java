@@ -8,12 +8,13 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.squareup.picasso.Picasso;
+import com.bumptech.glide.Glide;
 
 import java.util.List;
 
 /**
  * Created by Renado_Paria on 3/27/2017 at 3:41 PM.
+ * Hello There
  */
 
 class AuthorRelatedRVAdapter extends RecyclerView.Adapter<AuthorRelatedRVAdapter.AuthorRelatedArticlesViewHolder>
@@ -21,7 +22,7 @@ class AuthorRelatedRVAdapter extends RecyclerView.Adapter<AuthorRelatedRVAdapter
     private List<FeaturedArticle> mArticleList;
     private Context mContext;
 
-    public AuthorRelatedRVAdapter(List<FeaturedArticle> articleList, Context context)
+    AuthorRelatedRVAdapter(List<FeaturedArticle> articleList, Context context)
     {
         mArticleList = articleList;
         mContext = context;
@@ -40,7 +41,7 @@ class AuthorRelatedRVAdapter extends RecyclerView.Adapter<AuthorRelatedRVAdapter
         FeaturedArticle actualArticle = mArticleList.get(position);
         holder.mCategory.setText(actualArticle.getCategory());
         holder.mTitle.setText(actualArticle.getTitle());
-        Picasso.with(mContext)
+        Glide.with(mContext)
                 .load(actualArticle.getUrlToImage())
                 .error(R.drawable.ic_image_black_48dp)
                 .into(holder.mSportPicture);

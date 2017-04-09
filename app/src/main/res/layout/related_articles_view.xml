@@ -44,7 +44,7 @@
             android:layout_toEndOf="@+id/related_image_view"
             android:layout_toRightOf="@+id/related_image_view"
             android:ellipsize="end"
-            android:maxLines="7"
+            android:maxLines="5"
             android:textColor="@color/colorPrimaryText"
             android:textSize="18sp"
             android:textStyle="bold"

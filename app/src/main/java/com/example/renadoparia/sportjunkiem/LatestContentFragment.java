@@ -50,6 +50,7 @@ public class LatestContentFragment extends Fragment implements ValueEventListene
     private static final String FAVORITES_REF = "favorites";
 
     private LatestViewRecyclerAdapter mLatestViewAdapter;
+    private Query queryArticles;
 
     public LatestContentFragment()
     {
@@ -62,19 +63,18 @@ public class LatestContentFragment extends Fragment implements ValueEventListene
         mDatabaseReference = FirebaseDatabase.getInstance().getReference().child(mArticleRef);
         mCategory = getArguments().getString("Tag");
         mAuth = FirebaseAuth.getInstance();
-        Query queryArticles;
         if (mCategory != null)
         {
             if (mCategory.equalsIgnoreCase(HomeActivity.NO_MENU_ITEM_SELECTED))
             {
                 queryArticles = mDatabaseReference.orderByChild(QUERY_BY_AUTHOR_ID).limitToFirst(100);
-                queryArticles.addValueEventListener(this);
+                queryArticles.addListenerForSingleValueEvent(this);
                 mTitle = getString(R.string.home);
             }
             else
             {
                 queryArticles = mDatabaseReference.orderByChild(QUERY_BY_CATEGORY).equalTo(mCategory);
-                queryArticles.addValueEventListener(this);
+                queryArticles.addListenerForSingleValueEvent(this);
                 mTitle = mCategory;
             }
         }
@@ -255,4 +255,10 @@ public class LatestContentFragment extends Fragment implements ValueEventListene
         startActivity(fullArticle);
     }
 
+    @Override
+    public void onStop()
+    {
+        super.onStop();
+        queryArticles.removeEventListener(this);
+    }
 }

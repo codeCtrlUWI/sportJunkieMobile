@@ -107,6 +107,7 @@ public class SignUpFormActivity extends AppCompatActivity implements View.OnClic
                 if (user != null)
                 {
                     Intent tempIntent = new Intent(getApplicationContext(), HomeActivity.class);
+                    tempIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(tempIntent);
                     Log.d(TAG, "onAuthStateChanged: User is Signed In: " + user.getEmail());
                 }
