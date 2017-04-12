@@ -14,7 +14,7 @@ import java.util.List;
 
 /**
  * Created by Renado_Paria on 3/27/2017 at 10:41 PM for SportJunkieM.
- * 
+ *
  */
 
 class LatestViewRecyclerAdapter extends RecyclerView.Adapter<LatestViewRecyclerAdapter.ListViewHolder>

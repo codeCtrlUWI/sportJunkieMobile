@@ -42,6 +42,7 @@ public class UserFavoritesFragment extends Fragment implements OnRecyclerClickLi
 
     private FirebaseAuth mAuth;
     private DatabaseReference test;
+    private DatabaseReference mDatabaseReference;
     private ValueEventListener retrievingFavoritesList;
 
     public UserFavoritesFragment()
@@ -61,6 +62,7 @@ public class UserFavoritesFragment extends Fragment implements OnRecyclerClickLi
     {
         FeaturedArticle article = mUserFavoritesRVAdapter.getArticle(position);
         updateArticleClicks(article.getArticleID());
+        updateMainArticles(article.getArticleID());
         goToActualArticle(article);
     }
 
@@ -69,6 +71,37 @@ public class UserFavoritesFragment extends Fragment implements OnRecyclerClickLi
     {
         FeaturedArticle article = mUserFavoritesRVAdapter.getArticle(position);
         sharedIntent(article);
+    }
+
+    private void updateMainArticles(String id)
+    {
+        final String articleRef = "ARTICLES";
+        final String numClicksRef = "numberOfClicks";
+        mDatabaseReference = FirebaseDatabase.getInstance().getReference().child(articleRef).child(id).child(numClicksRef);
+        mDatabaseReference.runTransaction(new Transaction.Handler()
+        {
+            @Override
+            public Transaction.Result doTransaction(MutableData mutableData)
+            {
+                Long currentValue = mutableData.getValue(Long.class);
+                if (currentValue == null || currentValue < 0)
+                {
+                    mutableData.setValue(1);
+                }
+                else
+                {
+                    mutableData.setValue(currentValue + 1);
+                }
+                return Transaction.success(mutableData);
+            }
+
+            @Override
+            public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot)
+            {
+                Log.d(TAG, "onComplete: Transaction Completed");
+            }
+        });
+        Log.d(TAG, "updateArticleClicks: " + mDatabaseReference.toString());
     }
 
     @Override
@@ -286,7 +319,21 @@ public class UserFavoritesFragment extends Fragment implements OnRecyclerClickLi
     {
         super.onPause();
         Log.d(TAG, "onPause: starts");
-        test.removeEventListener(retrievingFavoritesList);
+
         Log.d(TAG, "onPause: ends");
+    }
+
+    @Override
+    public void onStop()
+    {
+        super.onStop();
+        test.removeEventListener(retrievingFavoritesList);
+    }
+
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+        retrieveFavoritesList();
     }
 }

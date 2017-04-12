@@ -40,6 +40,7 @@ public class FeaturedFragment extends Fragment implements ValueEventListener, On
     private RecyclerViewAdapter mRecyclerViewAdapter;
     private DatabaseReference mDatabaseReference;
     private Query queryArticles;
+    private String mCategory;
 
     public FeaturedFragment()
     {
@@ -50,16 +51,8 @@ public class FeaturedFragment extends Fragment implements ValueEventListener, On
     {
         super.onCreate(savedInstanceState);
         mAuth = FirebaseAuth.getInstance();
-        mDatabaseReference = FirebaseDatabase.getInstance().getReference().child(mArticleRef);
-        String category = getArguments().getString("Tag");
-        if (category != null && category.equalsIgnoreCase(HomeActivity.NO_MENU_ITEM_SELECTED))
-        {
-            queryArticles = mDatabaseReference.orderByChild(QUERY_ALL_ARTICLES).startAt(0).endAt(Long.MAX_VALUE);
-            queryArticles.addListenerForSingleValueEvent(this);
-            // queryArticles.removeEventListener(this);
-            mTitle = getString(R.string.home);
-        }
-        Log.d(TAG, "onCreate: tag: " + category);
+        mCategory = getArguments().getString("Tag");
+        mTitle = getString(R.string.home);
     }
 
 
@@ -157,13 +150,22 @@ public class FeaturedFragment extends Fragment implements ValueEventListener, On
     {
         super.onStop();
         Log.d(TAG, "onStop: called");
-        queryArticles.removeEventListener(this);
+
     }
 
     @Override
     public void onResume()
     {
         super.onResume();
+        mDatabaseReference = FirebaseDatabase.getInstance().getReference().child(mArticleRef);
+
+        if (mCategory != null && mCategory.equalsIgnoreCase(HomeActivity.NO_MENU_ITEM_SELECTED))
+        {
+            queryArticles = mDatabaseReference.orderByChild(QUERY_ALL_ARTICLES).startAt(0).endAt(Long.MAX_VALUE);
+            queryArticles.addValueEventListener(this);
+            // queryArticles.removeEventListener(this);
+
+        }
         Log.d(TAG, "onResume: called");
     }
 
@@ -172,6 +174,7 @@ public class FeaturedFragment extends Fragment implements ValueEventListener, On
     {
         super.onPause();
         Log.d(TAG, "onPause: called");
+        queryArticles.removeEventListener(this);
     }
 
     @Override

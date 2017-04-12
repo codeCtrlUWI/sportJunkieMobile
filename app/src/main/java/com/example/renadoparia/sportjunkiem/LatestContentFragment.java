@@ -67,17 +67,24 @@ public class LatestContentFragment extends Fragment implements ValueEventListene
         {
             if (mCategory.equalsIgnoreCase(HomeActivity.NO_MENU_ITEM_SELECTED))
             {
-                queryArticles = mDatabaseReference.orderByChild(QUERY_BY_AUTHOR_ID).limitToFirst(100);
-                queryArticles.addListenerForSingleValueEvent(this);
+                //queryArticles = mDatabaseReference.orderByChild(QUERY_BY_AUTHOR_ID).limitToFirst(100);
+                mDatabaseReference.addValueEventListener(this);
                 mTitle = getString(R.string.home);
             }
             else
             {
-                queryArticles = mDatabaseReference.orderByChild(QUERY_BY_CATEGORY).equalTo(mCategory);
-                queryArticles.addListenerForSingleValueEvent(this);
+                //queryArticles = mDatabaseReference.orderByChild(QUERY_BY_CATEGORY).equalTo(mCategory);
+                mDatabaseReference.addValueEventListener(this);
                 mTitle = mCategory;
             }
         }
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState)
+    {
+        super.onViewCreated(view, savedInstanceState);
+        getActivity().setTitle(mTitle);
     }
 
     @Nullable
@@ -106,6 +113,7 @@ public class LatestContentFragment extends Fragment implements ValueEventListene
     {
         FeaturedArticle article = mLatestViewAdapter.getArticle(position);
         updateArticleClicks(article.getArticleID());
+        updateMainArticles(article.getArticleID());
         goToActualArticle(article);
     }
 
@@ -259,6 +267,36 @@ public class LatestContentFragment extends Fragment implements ValueEventListene
     public void onStop()
     {
         super.onStop();
-        queryArticles.removeEventListener(this);
+        mDatabaseReference.removeEventListener(this);
+    }
+    private void updateMainArticles(String id)
+    {
+        final String articleRef = "ARTICLES";
+        final String numClicksRef = "numberOfClicks";
+        mDatabaseReference = FirebaseDatabase.getInstance().getReference().child(articleRef).child(id).child(numClicksRef);
+        mDatabaseReference.runTransaction(new Transaction.Handler()
+        {
+            @Override
+            public Transaction.Result doTransaction(MutableData mutableData)
+            {
+                Long currentValue = mutableData.getValue(Long.class);
+                if (currentValue == null || currentValue < 0)
+                {
+                    mutableData.setValue(1);
+                }
+                else
+                {
+                    mutableData.setValue(currentValue + 1);
+                }
+                return Transaction.success(mutableData);
+            }
+
+            @Override
+            public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot)
+            {
+                Log.d(TAG, "onComplete: Transaction Completed");
+            }
+        });
+        Log.d(TAG, "updateArticleClicks: " + mDatabaseReference.toString());
     }
 }

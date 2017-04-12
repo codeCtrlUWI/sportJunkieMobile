@@ -44,15 +44,21 @@ public class FeaturedCategoryFragment extends Fragment implements ValueEventList
     public void onCreate(@Nullable Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+
+    }
+
+    @Override
+    public void onResume()
+    {
+        super.onResume();
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child(mArticleRef);
         mCategory = getArguments().getString("Tag");
         Log.d(TAG, "onCreate: tag: " + mCategory);
 
         queryCategory = databaseReference.orderByChild(QUERY_BY_CATEGORY).equalTo(mCategory);
         Log.d(TAG, "onCreate: query: " + queryCategory.toString());
-        queryCategory.addListenerForSingleValueEvent(this);
+        queryCategory.addValueEventListener(this);
     }
-
 
     @Nullable
     @Override
@@ -122,9 +128,16 @@ public class FeaturedCategoryFragment extends Fragment implements ValueEventList
     }
 
     @Override
+    public void onPause()
+    {
+        super.onPause();
+        queryCategory.removeEventListener(this);
+    }
+
+    @Override
     public void onStop()
     {
         super.onStop();
-        queryCategory.removeEventListener(this);
+
     }
 }

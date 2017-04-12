@@ -376,11 +376,13 @@ public class ArticleDetailActivity extends AppCompatActivity implements OnRecycl
             case R.id.author_related_articles_card_view:
                 FeaturedArticle article = mAuthorRelatedRVAdapter.getArticle(position);
                 updateArticleClicks(article.getArticleID());
+                updateMainArticles(article.getArticleID());
                 goToActualArticle(article);
                 break;
             case R.id.related_articles_view:
                 FeaturedArticle related_article = mRelatedArticlesRVAdapter.getArticle(position);
                 updateArticleClicks(related_article.getArticleID());
+                updateMainArticles(related_article.getArticleID());
                 goToActualArticle(related_article);
                 break;
         }
@@ -518,6 +520,37 @@ public class ArticleDetailActivity extends AppCompatActivity implements OnRecycl
     private void updateArticleClicks(String id)
     {
         final String articleRef = "MICRO-ARTICLES";
+        final String numClicksRef = "numberOfClicks";
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child(articleRef).child(id).child(numClicksRef);
+        databaseReference.runTransaction(new Transaction.Handler()
+        {
+            @Override
+            public Transaction.Result doTransaction(MutableData mutableData)
+            {
+                Long currentValue = mutableData.getValue(Long.class);
+                if (currentValue == null || currentValue < 0)
+                {
+                    mutableData.setValue(1);
+                }
+                else
+                {
+                    mutableData.setValue(currentValue + 1);
+                }
+                return Transaction.success(mutableData);
+            }
+
+            @Override
+            public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot)
+            {
+                Log.d(TAG, "onComplete: Transaction Completed");
+            }
+        });
+        Log.d(TAG, "updateArticleClicks: " + databaseReference.toString());
+    }
+
+    private void updateMainArticles(String id)
+    {
+        final String articleRef = "ARTICLES";
         final String numClicksRef = "numberOfClicks";
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child(articleRef).child(id).child(numClicksRef);
         databaseReference.runTransaction(new Transaction.Handler()

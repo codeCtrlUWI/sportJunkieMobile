@@ -43,8 +43,8 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Artic
 
 
     private ImageButton favButton;
-
     private DatabaseReference mDatabaseReference;
+
 
 
     public RecyclerViewAdapter(List<FeaturedArticle> featuredArticles, Context context)
@@ -80,6 +80,7 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Artic
             {
                 String id = featuredArticle.getArticleID();
                 updateArticleClicks(id);
+                updateMainArticles(id);
                 goToActualArticle(featuredArticle);
             }
         });
@@ -99,6 +100,7 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Artic
             {
                 String id = featuredArticle.getArticleID();
                 updateArticleClicks(id);
+                updateMainArticles(id);
                 goToActualArticle(featuredArticle);
             }
         });
@@ -188,6 +190,37 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Artic
     private void updateArticleClicks(String id)
     {
         final String articleRef = "MICRO-ARTICLES";
+        final String numClicksRef = "numberOfClicks";
+        mDatabaseReference = FirebaseDatabase.getInstance().getReference().child(articleRef).child(id).child(numClicksRef);
+        mDatabaseReference.runTransaction(new Transaction.Handler()
+        {
+            @Override
+            public Transaction.Result doTransaction(MutableData mutableData)
+            {
+                Long currentValue = mutableData.getValue(Long.class);
+                if (currentValue == null || currentValue < 0)
+                {
+                    mutableData.setValue(1);
+                }
+                else
+                {
+                    mutableData.setValue(currentValue + 1);
+                }
+                return Transaction.success(mutableData);
+            }
+
+            @Override
+            public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot)
+            {
+                Log.d(TAG, "onComplete: Transaction Completed");
+            }
+        });
+        Log.d(TAG, "updateArticleClicks: " + mDatabaseReference.toString());
+    }
+
+    private void updateMainArticles(String id)
+    {
+        final String articleRef = "ARTICLES";
         final String numClicksRef = "numberOfClicks";
         mDatabaseReference = FirebaseDatabase.getInstance().getReference().child(articleRef).child(id).child(numClicksRef);
         mDatabaseReference.runTransaction(new Transaction.Handler()
