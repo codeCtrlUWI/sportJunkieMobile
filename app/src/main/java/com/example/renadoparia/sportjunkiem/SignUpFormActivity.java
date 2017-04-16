@@ -317,7 +317,7 @@ public class SignUpFormActivity extends AppCompatActivity implements View.OnClic
 
     //TODO:When user is registering, check if their email is arleady in the database,that means, that their account was already created
 
-    /*I Should Refactor This Code Some more, Cause why the fuck not*/
+    /*I Should Refactor This Code Some more, Cause why not*/
     private void doRegistration(final String fName, final String lName, final String email, final String password, View v)
     {
         final View view = v;
@@ -404,7 +404,6 @@ public class SignUpFormActivity extends AppCompatActivity implements View.OnClic
                                                 @Override
                                                 public void onFailure(@NonNull Exception e)
                                                 {
-                                                    //Ok, Fuck It All, You Don't wanna work, fuck it all
                                                     mProgressDialog.dismiss();
                                                 }
                                             });

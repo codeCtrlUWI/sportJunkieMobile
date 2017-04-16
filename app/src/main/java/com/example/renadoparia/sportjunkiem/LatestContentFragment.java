@@ -60,22 +60,39 @@ public class LatestContentFragment extends Fragment implements ValueEventListene
     public void onCreate(@Nullable Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        mDatabaseReference = FirebaseDatabase.getInstance().getReference().child(mArticleRef);
+
         mCategory = getArguments().getString("Tag");
         mAuth = FirebaseAuth.getInstance();
         if (mCategory != null)
         {
             if (mCategory.equalsIgnoreCase(HomeActivity.NO_MENU_ITEM_SELECTED))
             {
-                //queryArticles = mDatabaseReference.orderByChild(QUERY_BY_AUTHOR_ID).limitToFirst(100);
-                mDatabaseReference.addValueEventListener(this);
                 mTitle = getString(R.string.home);
             }
             else
             {
-                //queryArticles = mDatabaseReference.orderByChild(QUERY_BY_CATEGORY).equalTo(mCategory);
-                mDatabaseReference.addValueEventListener(this);
                 mTitle = mCategory;
+            }
+        }
+
+    }
+
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+        mDatabaseReference = FirebaseDatabase.getInstance().getReference().child(mArticleRef);
+        if (mCategory != null)
+        {
+            if (mCategory.equalsIgnoreCase(HomeActivity.NO_MENU_ITEM_SELECTED))
+            {
+                queryArticles = mDatabaseReference.orderByChild("articleID").limitToFirst(100);
+                queryArticles.addValueEventListener(this);
+            }
+            else
+            {
+                queryArticles = mDatabaseReference.orderByChild(QUERY_BY_CATEGORY).equalTo(mCategory);
+                queryArticles.addValueEventListener(this);
             }
         }
     }
@@ -267,8 +284,9 @@ public class LatestContentFragment extends Fragment implements ValueEventListene
     public void onStop()
     {
         super.onStop();
-        mDatabaseReference.removeEventListener(this);
+
     }
+
     private void updateMainArticles(String id)
     {
         final String articleRef = "ARTICLES";
@@ -298,5 +316,12 @@ public class LatestContentFragment extends Fragment implements ValueEventListene
             }
         });
         Log.d(TAG, "updateArticleClicks: " + mDatabaseReference.toString());
+    }
+
+    @Override
+    public void onPause()
+    {
+        super.onPause();
+       queryArticles.removeEventListener(this);
     }
 }
